@@ -60,10 +60,10 @@ export default async function Home() {
     <main className="flex min-h-screen flex-col items-center justify-center p-8">
       <h1 className="text-2xl font-bold mb-8">User Directory</h1>
       
-      {result.error && <ErrorMessage message={result.error} />}
+      {!result.ok && <ErrorMessage message={result.error.message} />}
       
       <Suspense fallback={<div className="text-xl">Loading users...</div>}>
-        {result.data && <UserList users={result.data} />}
+        {result.ok && <UserList users={result.value} />}
       </Suspense>
     </main>
   );

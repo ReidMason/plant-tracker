@@ -31,18 +31,16 @@ function ErrorMessage({ message }: { message: string }) {
 export default async function UserPage({ params }: { params: { id: string } }) {
   const result = await usersService.getUserById(params.id);
   
-  // If there's no data, show 404 page
-  if (!result.data) {
+  // If there's no data or the request failed, show 404 page
+  if (!result.ok) {
     notFound();
   }
   
-  const user = result.data;
+  const user = result.value;
   
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-8">
       <div className="max-w-md w-full bg-white shadow-lg rounded-lg overflow-hidden p-6">
-        {result.error && <ErrorMessage message={result.error} />}
-        
         <div className="flex justify-center mb-6">
           <div 
             className={`${getColorForUser(user.id)} w-24 h-24 rounded-full flex items-center justify-center text-white text-3xl font-bold`}

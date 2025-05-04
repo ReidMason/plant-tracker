@@ -1,23 +1,16 @@
-// Base API configuration
 const API_BASE_URL = 'http://localhost:8080';
 
-/**
- * Result type for API responses
- */
-export interface Result<T> {
-  data: T | null;
-  error: string | null;
-  success: boolean;
-}
+export type Result<T, E = Error> =
+  | { ok: true; value: T }
+  | { ok: false; error: E };
 
 /**
  * Create a successful result
  */
 export function createSuccessResult<T>(data: T): Result<T> {
   return {
-    data,
-    error: null,
-    success: true
+    ok: true,
+    value: data
   };
 }
 
@@ -26,9 +19,8 @@ export function createSuccessResult<T>(data: T): Result<T> {
  */
 export function createErrorResult<T>(error: string): Result<T> {
   return {
-    data: null,
-    error,
-    success: false
+    ok: false,
+    error: new Error(error)
   };
 }
 
