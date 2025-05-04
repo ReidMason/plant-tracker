@@ -3,23 +3,36 @@ package usersHandler
 import (
 	"fmt"
 	"net/http"
+	"strconv"
+	"strings"
 
 	apiResponse "github.com/ReidMason/plant-tracker/src/httpHandlers/models"
 	"github.com/ReidMason/plant-tracker/src/httpHandlers/usersHandler/userDtos"
-	usersService "github.com/ReidMason/plant-tracker/src/services"
+	usersStore "github.com/ReidMason/plant-tracker/src/stores/usersStore"
 )
 
-type usersHandler struct {
-	usersService usersService.GetUsersService
+type UsersHandlerService interface {
+	GetUsers() []usersStore.User
+	GetUserByID(id int) *usersStore.User
 }
 
-func New(usersService usersService.GetUsersService) *usersHandler {
+type usersHandler struct {
+	usersService UsersHandlerService
+}
+
+func New(usersService UsersHandlerService) *usersHandler {
 	return &usersHandler{
 		usersService: usersService,
 	}
 }
 
 func (u *usersHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	path := r.URL.Path
+	if strings.HasPrefix(path, "/users/") {
+		u.handleSingleUser(w, r)
+		return
+	}
+
 	switch r.Method {
 	case "GET":
 		users := u.usersService.GetUsers()
@@ -30,6 +43,31 @@ func (u *usersHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(w, "PUT /users")
 	case "DELETE":
 		fmt.Fprintln(w, "DELETE /users")
+	default:
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+	}
+}
+
+func (u *usersHandler) handleSingleUser(w http.ResponseWriter, r *http.Request) {
+	userIDStr := r.PathValue("id")
+	userID, err := strconv.Atoi(userIDStr)
+	if err != nil {
+		apiResponse.NotFound(w)
+		return
+	}
+
+	switch r.Method {
+	case "GET":
+		user := u.usersService.GetUserByID(userID)
+		if user == nil {
+			apiResponse.NotFound(w)
+			return
+		}
+		apiResponse.Ok(w, userDtos.FromStoreUser(*user))
+	case "PUT":
+		fmt.Fprintln(w, "PUT /users/{id}")
+	case "DELETE":
+		fmt.Fprintln(w, "DELETE /users/{id}")
 	default:
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 	}

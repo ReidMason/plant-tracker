@@ -15,6 +15,7 @@ func main() {
 	usersService := usersService.New(usersStore)
 
 	mux.Handle("/users", usersHandler.New(usersService))
+	mux.Handle("/users/{id}", usersHandler.New(usersService))
 
 	http.ListenAndServe(":8080", mux)
 }

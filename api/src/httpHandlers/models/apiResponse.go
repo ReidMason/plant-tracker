@@ -22,14 +22,20 @@ func Ok[T any](w http.ResponseWriter, data T) {
 	w.Write(responseJson)
 }
 
-func InternalServerError[T any](w http.ResponseWriter, errors []string) apiResponse[T] {
+func InternalServerError[T any](w http.ResponseWriter, errors []string) {
 	w.WriteHeader(http.StatusInternalServerError)
 	response := apiResponse[T]{Errors: errors}
 	responseJson, err := json.Marshal(response)
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		return apiResponse[T]{}
+		return
 	}
 	w.Write(responseJson)
-	return response
+	return
+}
+
+func NotFound(w http.ResponseWriter) {
+	w.WriteHeader(http.StatusNotFound)
+	http.Error(w, "Not Found", http.StatusNotFound)
+	return
 }
