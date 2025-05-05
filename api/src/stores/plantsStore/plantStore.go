@@ -23,7 +23,7 @@ func NewInMemoryPlantsStore() *InMemoryPlantsStore {
 }
 
 func (s *InMemoryPlantsStore) GetPlantsByUserId(userId int) []Plant {
-	var userPlants []Plant
+	userPlants := make([]Plant, 0)
 	for _, plant := range s.plants {
 		if plant.userId == userId {
 			userPlants = append(userPlants, plant)

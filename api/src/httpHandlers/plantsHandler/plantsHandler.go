@@ -86,17 +86,10 @@ func (p *plantsHandler) handleSinglePlant(w http.ResponseWriter, r *http.Request
 }
 
 func (p *plantsHandler) handlePlantsByUser(w http.ResponseWriter, r *http.Request) {
-	// Extract user ID from path
-	pathParts := strings.Split(r.URL.Path, "/")
-	if len(pathParts) != 4 {
-		http.Error(w, "Invalid path", http.StatusBadRequest)
-		return
-	}
-
-	userIDStr := pathParts[3]
+	userIDStr := r.PathValue("userId")
 	userID, err := strconv.Atoi(userIDStr)
 	if err != nil {
-		http.Error(w, "Invalid user ID", http.StatusBadRequest)
+		apiResponse.NotFound(w)
 		return
 	}
 
