@@ -101,5 +101,5 @@ func (u *usersHandler) handleCreateUser(w http.ResponseWriter, r *http.Request) 
 
 	// Create user
 	newUser := u.usersService.CreateUser(createUserDto.Name)
-	apiResponse.Created(w, newUser)
+	apiResponse.Created(w, userDtos.FromStoreUser(newUser))
 }
