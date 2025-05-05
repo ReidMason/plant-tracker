@@ -6,8 +6,8 @@ import (
 )
 
 type apiResponse[T any] struct {
-	Data   T        `json:"data,omitempty"`
-	Errors []string `json:"errors,omitempty"`
+	Data   T        `json:"data"`
+	Errors []string `json:"errors"`
 }
 
 func createResponse[T any](data T) apiResponse[T] {
