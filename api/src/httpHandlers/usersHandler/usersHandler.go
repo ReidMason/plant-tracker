@@ -1,7 +1,9 @@
 package usersHandler
 
 import (
+	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"strconv"
 	"strings"
@@ -14,6 +16,7 @@ import (
 type UsersHandlerService interface {
 	GetUsers() []usersStore.User
 	GetUserByID(id int) *usersStore.User
+	CreateUser(name string) usersStore.User
 }
 
 type usersHandler struct {
@@ -38,7 +41,7 @@ func (u *usersHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		users := u.usersService.GetUsers()
 		apiResponse.Ok(w, userDtos.FromStoreUsers(users))
 	case "POST":
-		fmt.Fprintln(w, "POST /users")
+		u.handleCreateUser(w, r)
 	case "PUT":
 		fmt.Fprintln(w, "PUT /users")
 	case "DELETE":
@@ -71,4 +74,32 @@ func (u *usersHandler) handleSingleUser(w http.ResponseWriter, r *http.Request) 
 	default:
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 	}
+}
+
+func (u *usersHandler) handleCreateUser(w http.ResponseWriter, r *http.Request) {
+	// Read request body
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		apiResponse.InternalServerError[any](w, []string{"Failed to read request body"})
+		return
+	}
+	defer r.Body.Close()
+
+	// Parse request body
+	var createUserDto userDtos.CreateUserDto
+	err = json.Unmarshal(body, &createUserDto)
+	if err != nil {
+		apiResponse.BadRequest[any](w, []string{"Failed to parse request body"})
+		return
+	}
+
+	// Validate request
+	if createUserDto.Name == "" {
+		apiResponse.BadRequest[any](w, []string{"Name is required"})
+		return
+	}
+
+	// Create user
+	newUser := u.usersService.CreateUser(createUserDto.Name)
+	apiResponse.Created(w, newUser)
 }

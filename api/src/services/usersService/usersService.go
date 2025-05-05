@@ -5,6 +5,7 @@ import usersStore "github.com/ReidMason/plant-tracker/src/stores/usersStore"
 type GetUsersService interface {
 	GetUsers() []usersStore.User
 	GetUserByID(id int) *usersStore.User
+	CreateUser(name string) usersStore.User
 }
 
 type UsersService struct {
@@ -23,4 +24,8 @@ func (u *UsersService) GetUsers() []usersStore.User {
 
 func (u *UsersService) GetUserByID(id int) *usersStore.User {
 	return u.usersStore.GetUserByID(id)
+}
+
+func (u *UsersService) CreateUser(name string) usersStore.User {
+	return u.usersStore.CreateUser(name)
 }
