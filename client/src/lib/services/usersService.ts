@@ -5,6 +5,10 @@ export interface User {
   name: string;
 }
 
+export interface CreateUserRequest {
+  name: string;
+}
+
 /**
  * Service for handling user-related API calls
  */
@@ -21,6 +25,13 @@ class UsersService extends BaseApi {
    */
   async getUserById(id: string | number): Promise<Result<User>> {
     return await this.get<User>(`/users/${id}`);
+  }
+
+  /**
+   * Create a new user
+   */
+  async createUser(userData: CreateUserRequest): Promise<Result<User>> {
+    return await this.post<User, CreateUserRequest>('/users', userData);
   }
 }
 

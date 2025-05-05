@@ -39,6 +39,21 @@ function UserList({ users }: { users: User[] }) {
           <span className="mt-2 text-center group-hover:font-medium">{user.name}</span>
         </Link>
       ))}
+      
+      {/* Add user button */}
+      <Link 
+        href="/user/new" 
+        className="flex flex-col items-center group transition-transform hover:scale-105"
+      >
+        <div 
+          className="bg-gray-200 w-16 h-16 rounded-full flex items-center justify-center text-gray-600 text-xl font-bold transition-shadow group-hover:shadow-lg group-hover:bg-gray-300"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+          </svg>
+        </div>
+        <span className="mt-2 text-center group-hover:font-medium">Add User</span>
+      </Link>
     </div>
   );
 }
