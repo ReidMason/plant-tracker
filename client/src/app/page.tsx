@@ -1,6 +1,10 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import usersService, { User } from "../lib/services/usersService";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { AlertCircle, Plus } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 // Generate a vibrant color based on the user id
 function getColorForUser(userId: number) {
@@ -20,7 +24,7 @@ function getColorForUser(userId: number) {
 
 function UserList({ users }: { users: User[] }) {
   if (users.length === 0) {
-    return <div className="text-lg text-gray-500">No users found.</div>;
+    return <div className="text-lg text-muted-foreground">No users found.</div>;
   }
 
   return (
@@ -31,11 +35,11 @@ function UserList({ users }: { users: User[] }) {
           key={user.id}
           className="flex flex-col items-center group transition-transform hover:scale-105"
         >
-          <div 
-            className={`${getColorForUser(user.id)} w-16 h-16 rounded-full flex items-center justify-center text-white text-xl font-bold transition-shadow group-hover:shadow-lg`}
-          >
-            {user.name.charAt(0)}
-          </div>
+          <Avatar className={`${getColorForUser(user.id)} w-16 h-16 transition-shadow group-hover:shadow-lg`}>
+            <AvatarFallback className="text-white text-xl font-bold">
+              {user.name.charAt(0)}
+            </AvatarFallback>
+          </Avatar>
           <span className="mt-2 text-center group-hover:font-medium">{user.name}</span>
         </Link>
       ))}
@@ -45,13 +49,11 @@ function UserList({ users }: { users: User[] }) {
         href="/user/new" 
         className="flex flex-col items-center group transition-transform hover:scale-105"
       >
-        <div 
-          className="bg-gray-200 w-16 h-16 rounded-full flex items-center justify-center text-gray-600 text-xl font-bold transition-shadow group-hover:shadow-lg group-hover:bg-gray-300"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-          </svg>
-        </div>
+        <Avatar className="bg-muted w-16 h-16 transition-shadow group-hover:shadow-lg group-hover:bg-muted/80">
+          <AvatarFallback className="text-muted-foreground">
+            <Plus className="h-6 w-6" />
+          </AvatarFallback>
+        </Avatar>
         <span className="mt-2 text-center group-hover:font-medium">Add User</span>
       </Link>
     </div>
@@ -60,11 +62,14 @@ function UserList({ users }: { users: User[] }) {
 
 function ErrorMessage({ message }: { message: string }) {
   return (
-    <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded relative mb-6 max-w-lg" role="alert">
-      <strong className="font-bold">Error: </strong>
-      <span className="block sm:inline">{message}</span>
-      <p className="mt-2">Please check that the API server is running at http://localhost:8080</p>
-    </div>
+    <Alert variant="destructive" className="mb-6 max-w-lg">
+      <AlertCircle className="h-4 w-4" />
+      <AlertTitle>Error</AlertTitle>
+      <AlertDescription>
+        {message}
+        <p className="mt-2">Please check that the API server is running at http://localhost:8080</p>
+      </AlertDescription>
+    </Alert>
   );
 }
 
@@ -73,13 +78,18 @@ export default async function Home() {
   
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-8">
-      <h1 className="text-2xl font-bold mb-8">User Directory</h1>
-      
-      {!result.ok && <ErrorMessage message={result.error.message} />}
-      
-      <Suspense fallback={<div className="text-xl">Loading users...</div>}>
-        {result.ok && <UserList users={result.value} />}
-      </Suspense>
+      <Card className="w-full max-w-4xl">
+        <CardHeader>
+          <CardTitle className="text-center">User Directory</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {!result.ok && <ErrorMessage message={result.error.message} />}
+          
+          <Suspense fallback={<div className="text-xl text-center">Loading users...</div>}>
+            {result.ok && <UserList users={result.value} />}
+          </Suspense>
+        </CardContent>
+      </Card>
     </main>
   );
 }

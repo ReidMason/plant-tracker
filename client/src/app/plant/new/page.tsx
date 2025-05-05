@@ -4,6 +4,12 @@ import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import plantsService from "../../../lib/services/plantsService";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { AlertCircle, ArrowLeft, Loader2 } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export default function NewPlantPage() {
   const [name, setName] = useState("");
@@ -58,50 +64,55 @@ export default function NewPlantPage() {
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-8">
-      <div className="max-w-md w-full bg-white shadow-lg rounded-lg overflow-hidden p-6">
-        <h1 className="text-2xl font-bold text-center mb-6">Add New Plant</h1>
+      <Card className="max-w-md w-full">
+        <CardHeader>
+          <CardTitle className="text-2xl text-center">Add New Plant</CardTitle>
+        </CardHeader>
         
-        {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded relative mb-6" role="alert">
-            <span className="block sm:inline">{error}</span>
-          </div>
-        )}
-        
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
-              Plant Name
-            </label>
-            <input
-              type="text"
-              id="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"
-              placeholder="Enter plant name"
-              autoFocus
-            />
-          </div>
+        <CardContent>
+          {error && (
+            <Alert variant="destructive" className="mb-6">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
           
-          <div className="flex justify-between pt-4">
-            <Link
-              href={userId ? `/user/${userId}` : '/'}
-              className="px-4 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition"
-            >
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="name">Plant Name</Label>
+              <Input
+                id="name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Enter plant name"
+                autoFocus
+              />
+            </div>
+          </form>
+        </CardContent>
+        
+        <CardFooter className="flex justify-between">
+          <Button variant="outline" asChild>
+            <Link href={userId ? `/user/${userId}` : '/'}>
+              <ArrowLeft className="mr-2 h-4 w-4" />
               Cancel
             </Link>
-            <button
-              type="submit"
-              disabled={isSubmitting || !userId}
-              className={`px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition ${
-                (isSubmitting || !userId) ? "opacity-70 cursor-not-allowed" : ""
-              }`}
-            >
-              {isSubmitting ? "Creating..." : "Create Plant"}
-            </button>
-          </div>
-        </form>
-      </div>
+          </Button>
+          <Button 
+            onClick={handleSubmit}
+            disabled={isSubmitting || !userId}
+            variant="default"
+            className="bg-green-600 hover:bg-green-700"
+          >
+            {isSubmitting ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Creating...
+              </>
+            ) : "Create Plant"}
+          </Button>
+        </CardFooter>
+      </Card>
     </main>
   );
 } 

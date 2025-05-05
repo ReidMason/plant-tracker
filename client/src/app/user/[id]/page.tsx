@@ -2,6 +2,10 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import usersService from '../../../lib/services/usersService';
 import plantsService, { Plant } from '../../../lib/services/plantsService';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { AlertCircle, Home, Plus } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 // Generate a vibrant color based on the user id
 function getColorForUser(userId: number) {
@@ -37,18 +41,21 @@ function getColorForPlant(plantId: number) {
 
 function ErrorMessage({ message }: { message: string }) {
   return (
-    <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded relative mb-6 w-full" role="alert">
-      <strong className="font-bold">Error: </strong>
-      <span className="block sm:inline">{message}</span>
-      <p className="mt-2">Please check that the API server is running at http://localhost:8080</p>
-    </div>
+    <Alert variant="destructive" className="mb-6">
+      <AlertCircle className="h-4 w-4" />
+      <AlertTitle>Error</AlertTitle>
+      <AlertDescription>
+        {message}
+        <p className="mt-2">Please check that the API server is running at http://localhost:8080</p>
+      </AlertDescription>
+    </Alert>
   );
 }
 
 function PlantsList({ plants }: { plants: Plant[] }) {
   if (plants.length === 0) {
     return (
-      <div className="text-center text-gray-500 my-6">
+      <div className="text-center text-muted-foreground my-6">
         No plants found for this user.
       </div>
     );
@@ -59,17 +66,17 @@ function PlantsList({ plants }: { plants: Plant[] }) {
       <h2 className="text-lg font-semibold mb-4">Plants</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         {plants.map((plant) => (
-          <div 
+          <Card 
             key={plant.id} 
-            className="flex items-center p-3 rounded-lg border border-gray-200 hover:shadow-md transition-shadow"
+            className="flex items-center p-3 hover:shadow-md transition-shadow"
           >
-            <div className={`${getColorForPlant(plant.id)} w-10 h-10 rounded-full flex items-center justify-center mr-3`}>
-              <span className="text-sm">{plant.id}</span>
-            </div>
+            <Avatar className={`${getColorForPlant(plant.id)} mr-3`}>
+              <AvatarFallback>{plant.id}</AvatarFallback>
+            </Avatar>
             <div>
               <h3 className="font-medium">{plant.name}</h3>
             </div>
-          </div>
+          </Card>
         ))}
       </div>
     </div>
@@ -92,39 +99,57 @@ export default async function UserPage({ params }: { params: { id: string } }) {
   
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-8">
-      <div className="max-w-md w-full bg-white shadow-lg rounded-lg overflow-hidden p-6">
-        <div className="flex justify-center mb-6">
-          <div 
-            className={`${getColorForUser(user.id)} w-24 h-24 rounded-full flex items-center justify-center text-white text-3xl font-bold`}
-          >
-            {user.name.charAt(0)}
+      <Card className="max-w-md w-full">
+        <CardHeader className="text-center">
+          <div className="flex justify-center mb-4">
+            <Avatar className={`${getColorForUser(user.id)} w-24 h-24`}>
+              <AvatarFallback className="text-white text-3xl font-bold">
+                {user.name.charAt(0)}
+              </AvatarFallback>
+            </Avatar>
           </div>
-        </div>
+          <CardTitle className="text-2xl">{user.name}</CardTitle>
+          <CardDescription>User Profile</CardDescription>
+        </CardHeader>
+
+        <CardContent className="space-y-6">
+          <Card className="bg-muted/40">
+            <CardContent className="pt-6">
+              <div className="space-y-2">
+                <div className="flex justify-between">
+                  <span className="font-medium">ID:</span>
+                  <span>{user.id}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="font-medium">Name:</span>
+                  <span>{user.name}</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          
+          {!plantsResult.ok && <ErrorMessage message={plantsResult.error.message} />}
+          
+          {plantsResult.ok && <PlantsList plants={plantsResult.value} />}
+        </CardContent>
         
-        <h1 className="text-2xl font-bold text-center mb-6">{user.name}</h1>
-        
-        <div className="bg-gray-100 p-4 rounded-lg mb-6">
-          <h2 className="text-lg font-semibold mb-2">User Details</h2>
-          <p><span className="font-medium">ID:</span> {user.id}</p>
-          <p><span className="font-medium">Name:</span> {user.name}</p>
-        </div>
-        
-        {!plantsResult.ok && <ErrorMessage message={plantsResult.error.message} />}
-        
-        {plantsResult.ok && <PlantsList plants={plantsResult.value} />}
-        
-        <div className="flex justify-between">
-          <Link href="/" className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition">
-            Back to Users
+        <div className="flex justify-between px-6 py-4 border-t">
+          <Link 
+            href="/" 
+            className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
+          >
+            <Home className="mr-2 h-4 w-4" />
+            Back
           </Link>
           <Link 
-            href={`/plant/new?userId=${user.id}`} 
-            className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition"
+            href={`/plant/new?userId=${user.id}`}
+            className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2"
           >
+            <Plus className="mr-2 h-4 w-4" />
             Add Plant
           </Link>
         </div>
-      </div>
+      </Card>
     </main>
   );
 } 
