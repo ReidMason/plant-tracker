@@ -1,7 +1,9 @@
 package plantsHandler
 
 import (
+	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"strconv"
 	"strings"
@@ -14,6 +16,7 @@ import (
 type PlantsHandlerService interface {
 	GetPlantsByUserId(userId int) []plantstore.Plant
 	GetPlantById(id int) *plantstore.Plant
+	CreatePlant(name string, userId int) plantstore.Plant
 }
 
 type plantsHandler struct {
@@ -47,7 +50,7 @@ func (p *plantsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		// Return all plants is not implemented as it's dangerous without pagination
 		http.Error(w, "Not implemented - use /plants/user/{userId} instead", http.StatusNotImplemented)
 	case "POST":
-		fmt.Fprintln(w, "POST /plants")
+		p.handleCreatePlant(w, r)
 	case "PUT":
 		fmt.Fprintln(w, "PUT /plants")
 	case "DELETE":
@@ -104,4 +107,39 @@ func (p *plantsHandler) handlePlantsByUser(w http.ResponseWriter, r *http.Reques
 	default:
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 	}
+}
+
+func (p *plantsHandler) handleCreatePlant(w http.ResponseWriter, r *http.Request) {
+	// Read request body
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		apiResponse.InternalServerError[any](w, []string{"Failed to read request body"})
+		return
+	}
+	defer r.Body.Close()
+
+	// Parse request body
+	var createPlantDto plantDtos.CreatePlantDto
+	err = json.Unmarshal(body, &createPlantDto)
+	if err != nil {
+		apiResponse.BadRequest[any](w, []string{"Failed to parse request body"})
+		return
+	}
+
+	// Validate request
+	if createPlantDto.Name == "" {
+		apiResponse.BadRequest[any](w, []string{"Name is required"})
+		return
+	}
+
+	if createPlantDto.UserId <= 0 {
+		apiResponse.BadRequest[any](w, []string{"Valid user ID is required"})
+		return
+	}
+
+	// Create plant
+	newPlant := p.plantsService.CreatePlant(createPlantDto.Name, createPlantDto.UserId)
+
+	// Return created plant
+	apiResponse.Created(w, plantDtos.FromStorePlant(newPlant))
 }
