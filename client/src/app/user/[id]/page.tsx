@@ -2,7 +2,6 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import usersService from '../../../lib/services/usersService';
 import plantsService, { Plant } from '../../../lib/services/plantsService';
-import { Result } from '../../../lib/services/api';
 
 // Generate a vibrant color based on the user id
 function getColorForUser(userId: number) {
@@ -78,7 +77,8 @@ function PlantsList({ plants }: { plants: Plant[] }) {
 }
 
 export default async function UserPage({ params }: { params: { id: string } }) {
-  const userResult = await usersService.getUserById(params.id);
+  const {id} = await params;
+  const userResult = await usersService.getUserById(id);
   
   // If there's no data or the request failed, show 404 page
   if (!userResult.ok) {
