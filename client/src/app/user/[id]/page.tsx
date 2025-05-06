@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { AlertCircle, Home, Plus } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import UserAvatar from "@/components/UserAvatar";
 
 // Generate a vibrant color based on the plant id
 function getColorForPlant(plantId: number) {
@@ -33,7 +34,7 @@ function PlantsList({ plants }: { plants: Plant[] }) {
   }
 
   return (
-    <div className="space-y-3 my-6">
+    <div className="space-y-3">
       <h2 className="text-lg font-semibold mb-4">Plants</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         {plants.map((plant) => (
@@ -86,32 +87,13 @@ export default async function UserPage({ params }: { params: { id: string } }) {
       <Card className="max-w-md w-full">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
-            <Avatar className="w-24 h-24" style={{ backgroundColor: user.colour }}>
-              <AvatarFallback className="text-white text-3xl font-bold">
-                {user.name.charAt(0)}
-              </AvatarFallback>
-            </Avatar>
+            <UserAvatar user={user} size="lg" />
           </div>
           <CardTitle className="text-2xl">{user.name}</CardTitle>
           <CardDescription>User Profile</CardDescription>
         </CardHeader>
 
-        <CardContent className="space-y-6">
-          <Card className="bg-muted/40">
-            <CardContent className="pt-6">
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <span className="font-medium">ID:</span>
-                  <span>{user.id}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="font-medium">Name:</span>
-                  <span>{user.name}</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          
+        <CardContent>
           {!plantsResult.ok && <ErrorMessage message={plantsResult.error.message} />}
           
           {plantsResult.ok && <PlantsList plants={plantsResult.value} />}

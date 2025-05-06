@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { AlertCircle, Plus } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import UserAvatar from "@/components/UserAvatar";
 
 function UserList({ users }: { users: User[] }) {
   if (users.length === 0) {
@@ -19,11 +20,7 @@ function UserList({ users }: { users: User[] }) {
           key={user.id}
           className="flex flex-col items-center group transition-transform hover:scale-105"
         >
-          <Avatar className="w-16 h-16 transition-shadow group-hover:shadow-lg" style={{ backgroundColor: user.colour }}>
-            <AvatarFallback className="text-white text-xl font-bold">
-              {user.name.charAt(0)}
-            </AvatarFallback>
-          </Avatar>
+          <UserAvatar user={user} />
           <span className="mt-2 text-center group-hover:font-medium">{user.name}</span>
         </Link>
       ))}
