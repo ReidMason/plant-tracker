@@ -35,65 +35,48 @@ func New(eventsService EventsHandlerService) *eventsHandler {
 func (h *eventsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	path := r.URL.Path
 
-	// Handle specific event by ID
-	if strings.HasPrefix(path, "/events/") && !strings.Contains(path[8:], "/") {
-		h.handleSingleEvent(w, r)
-		return
-	}
-
-	// Handle events for a specific plant
-	if strings.HasPrefix(path, "/plants/") && strings.Contains(path, "/events") {
+	// Handle plant events (e.g. /users/{userId}/plants/{plantId}/events)
+	if strings.HasPrefix(path, "/users/") && strings.Contains(path, "/plants/") && strings.HasSuffix(path, "/events") {
 		h.handlePlantEvents(w, r)
 		return
 	}
 
-	// Handle all events
-	switch r.Method {
-	case "POST":
-		h.handleCreateEvent(w, r)
-	default:
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-	}
-}
-
-// handleSingleEvent handles requests for a specific event
-func (h *eventsHandler) handleSingleEvent(w http.ResponseWriter, r *http.Request) {
-	eventIDStr := r.PathValue("id")
-	eventID, err := strconv.Atoi(eventIDStr)
-	if err != nil {
-		apiResponse.NotFound(w)
-		return
-	}
-
-	event := h.eventsService.GetEventById(eventID)
-	if event == nil {
-		apiResponse.NotFound(w)
-		return
-	}
-
-	apiResponse.Ok(w, eventDtos.FromStoreEvent(*event))
+	// If we get here, no route matched
+	http.Error(w, "Not found", http.StatusNotFound)
 }
 
 // handlePlantEvents handles requests for events related to a specific plant
 func (h *eventsHandler) handlePlantEvents(w http.ResponseWriter, r *http.Request) {
-	plantIDStr := r.PathValue("id")
+	// Extract plant ID from path
+	parts := strings.Split(r.URL.Path, "/")
+	if len(parts) < 6 {
+		apiResponse.NotFound(w)
+		return
+	}
+
+	// Get plant ID from the URL
+	plantIDStr := parts[4]
 	plantID, err := strconv.Atoi(plantIDStr)
 	if err != nil {
 		apiResponse.NotFound(w)
 		return
 	}
 
-	if r.Method == "GET" {
+	switch r.Method {
+	case "GET":
+		// Get events for the plant
 		events := h.eventsService.GetEventsByPlantId(plantID)
 		apiResponse.Ok(w, eventDtos.FromStoreEvents(events))
-		return
+	case "POST":
+		// Create a new event for the plant
+		h.handleCreateEvent(w, r, plantID)
+	default:
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 	}
-
-	http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 }
 
 // handleCreateEvent handles requests to create a new event
-func (h *eventsHandler) handleCreateEvent(w http.ResponseWriter, r *http.Request) {
+func (h *eventsHandler) handleCreateEvent(w http.ResponseWriter, r *http.Request, plantId int) {
 	// Read request body
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
@@ -110,11 +93,8 @@ func (h *eventsHandler) handleCreateEvent(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	// Validate request
-	if createEventDto.PlantId <= 0 {
-		apiResponse.BadRequest[any](w, []string{"Plant ID is required"})
-		return
-	}
+	// Set the plant ID from the URL parameter
+	createEventDto.PlantId = plantId
 
 	// Create watering event
 	newEvent, err := h.eventsService.CreateWateringEvent(createEventDto.PlantId, createEventDto.Note)

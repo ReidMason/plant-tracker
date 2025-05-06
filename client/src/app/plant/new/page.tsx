@@ -43,10 +43,7 @@ export default function NewPlantPage() {
     setError(null);
 
     try {
-      const result = await plantsService.createPlant({ 
-        name, 
-        userId: parseInt(userId)
-      });
+      const result = await plantsService.createPlant(userId, { name });
       
       if (!result.ok) {
         throw new Error(result.error.message);
@@ -54,7 +51,7 @@ export default function NewPlantPage() {
 
       // Navigate back to the user detail page
       router.push(`/user/${userId}`);
-      router.refresh();
+    
     } catch (err) {
       setError(err instanceof Error ? err.message : "An unknown error occurred");
     } finally {
@@ -109,7 +106,9 @@ export default function NewPlantPage() {
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 Creating...
               </>
-            ) : "Create Plant"}
+            ) : (
+              'Create Plant'
+            )}
           </Button>
         </CardFooter>
       </Card>

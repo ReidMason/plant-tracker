@@ -32,36 +32,59 @@ func New(plantsService PlantsHandlerService) *plantsHandler {
 func (p *plantsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	path := r.URL.Path
 
-	// Handle direct plant request (e.g. /plants/1)
-	if strings.HasPrefix(path, "/plants/") && !strings.Contains(path, "/user/") {
-		p.handleSinglePlant(w, r)
+	// Handle user plants collection (e.g. /users/1/plants)
+	if strings.HasPrefix(path, "/users/") && strings.HasSuffix(path, "/plants") && !strings.Contains(path, "/plants/") {
+		p.handleUserPlants(w, r)
 		return
 	}
 
-	// Handle plants by user request (e.g. /plants/user/1)
-	if strings.HasPrefix(path, "/plants/user/") {
-		p.handlePlantsByUser(w, r)
+	// Handle specific plant for user (e.g. /users/1/plants/2)
+	if strings.HasPrefix(path, "/users/") && strings.Contains(path, "/plants/") && !strings.Contains(path, "/events") {
+		p.handleSingleUserPlant(w, r)
 		return
 	}
 
-	// Handle collection endpoints
+	// If no patterns match, return 404
+	http.Error(w, "Not found", http.StatusNotFound)
+}
+
+func (p *plantsHandler) handleUserPlants(w http.ResponseWriter, r *http.Request) {
+	// Extract user ID from path
+	parts := strings.Split(r.URL.Path, "/")
+	if len(parts) < 3 {
+		apiResponse.NotFound(w)
+		return
+	}
+
+	userIDStr := parts[2]
+	userID, err := strconv.Atoi(userIDStr)
+	if err != nil {
+		apiResponse.NotFound(w)
+		return
+	}
+
 	switch r.Method {
 	case "GET":
-		// Return all plants is not implemented as it's dangerous without pagination
-		http.Error(w, "Not implemented - use /plants/user/{userId} instead", http.StatusNotImplemented)
+		plants := p.plantsService.GetPlantsByUserId(userID)
+		apiResponse.Ok(w, plantDtos.FromStorePlants(plants))
 	case "POST":
-		p.handleCreatePlant(w, r)
-	case "PUT":
-		fmt.Fprintln(w, "PUT /plants")
-	case "DELETE":
-		fmt.Fprintln(w, "DELETE /plants")
+		p.handleCreatePlant(w, r, userID)
 	default:
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 	}
 }
 
-func (p *plantsHandler) handleSinglePlant(w http.ResponseWriter, r *http.Request) {
-	plantIDStr := r.PathValue("id")
+func (p *plantsHandler) handleSingleUserPlant(w http.ResponseWriter, r *http.Request) {
+	// Extract IDs from path (/users/{userId}/plants/{plantId})
+	parts := strings.Split(r.URL.Path, "/")
+	if len(parts) < 5 {
+		apiResponse.NotFound(w)
+		return
+	}
+
+	// Extract plantId (we don't need userId for this operation)
+	plantIDStr := parts[4]
+
 	plantID, err := strconv.Atoi(plantIDStr)
 	if err != nil {
 		apiResponse.NotFound(w)
@@ -77,32 +100,15 @@ func (p *plantsHandler) handleSinglePlant(w http.ResponseWriter, r *http.Request
 		}
 		apiResponse.Ok(w, plantDtos.FromStorePlant(*plant))
 	case "PUT":
-		fmt.Fprintln(w, "PUT /plants/{id}")
+		fmt.Fprintln(w, "PUT /users/{userId}/plants/{plantId}")
 	case "DELETE":
-		fmt.Fprintln(w, "DELETE /plants/{id}")
+		fmt.Fprintln(w, "DELETE /users/{userId}/plants/{plantId}")
 	default:
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 	}
 }
 
-func (p *plantsHandler) handlePlantsByUser(w http.ResponseWriter, r *http.Request) {
-	userIDStr := r.PathValue("userId")
-	userID, err := strconv.Atoi(userIDStr)
-	if err != nil {
-		apiResponse.NotFound(w)
-		return
-	}
-
-	switch r.Method {
-	case "GET":
-		plants := p.plantsService.GetPlantsByUserId(userID)
-		apiResponse.Ok(w, plantDtos.FromStorePlants(plants))
-	default:
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-	}
-}
-
-func (p *plantsHandler) handleCreatePlant(w http.ResponseWriter, r *http.Request) {
+func (p *plantsHandler) handleCreatePlant(w http.ResponseWriter, r *http.Request, userId int) {
 	// Read request body
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
@@ -125,10 +131,8 @@ func (p *plantsHandler) handleCreatePlant(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	if createPlantDto.UserId <= 0 {
-		apiResponse.BadRequest[any](w, []string{"Valid user ID is required"})
-		return
-	}
+	// Set the userId from the URL parameter
+	createPlantDto.UserId = userId
 
 	// Create plant
 	newPlant := p.plantsService.CreatePlant(createPlantDto.Name, createPlantDto.UserId)
