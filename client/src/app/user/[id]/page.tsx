@@ -1,59 +1,13 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import usersService from '../../../lib/services/usersService';
-import plantsService, { Plant } from '../../../lib/services/plantsService';
+import plantsService from '../../../lib/services/plantsService';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { AlertCircle, Home, Plus } from "lucide-react";
+import { Home, Plus } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
 import UserAvatar from "@/components/UserAvatar";
-
-// Generate a vibrant color based on the plant id
-function getColorForPlant(plantId: number) {
-  const colors = [
-    "bg-green-200",
-    "bg-green-300",
-    "bg-emerald-200",
-    "bg-teal-200",
-    "bg-cyan-200",
-    "bg-lime-200",
-    "bg-yellow-200",
-    "bg-amber-200",
-  ];
-  
-  return colors[plantId % colors.length];
-}
-
-function PlantsList({ plants }: { plants: Plant[] }) {
-  if (plants.length === 0) {
-    return (
-      <div className="text-center text-muted-foreground my-6">
-        No plants found for this user.
-      </div>
-    );
-  }
-
-  return (
-    <div className="space-y-3">
-      <h2 className="text-lg font-semibold mb-4">Plants</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-        {plants.map((plant) => (
-          <Card 
-            key={plant.id} 
-            className="flex items-center p-3 hover:shadow-md transition-shadow"
-          >
-            <Avatar className={`${getColorForPlant(plant.id)} mr-3`}>
-              <AvatarFallback>{plant.id}</AvatarFallback>
-            </Avatar>
-            <div>
-              <h3 className="font-medium">{plant.name}</h3>
-            </div>
-          </Card>
-        ))}
-      </div>
-    </div>
-  );
-}
+import PlantListWithWatering from '@/components/PlantListWithWatering';
 
 function ErrorMessage({ message }: { message: string }) {
   return (
@@ -96,7 +50,9 @@ export default async function UserPage({ params }: { params: { id: string } }) {
         <CardContent>
           {!plantsResult.ok && <ErrorMessage message={plantsResult.error.message} />}
           
-          {plantsResult.ok && <PlantsList plants={plantsResult.value} />}
+          {plantsResult.ok && (
+            <PlantListWithWatering plants={plantsResult.value} userId={user.id} />
+          )}
         </CardContent>
         
         <div className="flex justify-between px-6 py-4 border-t">
