@@ -3,8 +3,9 @@ package userDtos
 import usersStore "github.com/ReidMason/plant-tracker/src/stores/usersStore"
 
 type UserResponseDto struct {
-	Name string `json:"name"`
-	Id   int    `json:"id"`
+	Name   string `json:"name"`
+	Id     int    `json:"id"`
+	Colour string `json:"colour"`
 }
 
 func FromStoreUsers(users []usersStore.User) []*UserResponseDto {
@@ -18,7 +19,8 @@ func FromStoreUsers(users []usersStore.User) []*UserResponseDto {
 
 func FromStoreUser(user usersStore.User) *UserResponseDto {
 	return &UserResponseDto{
-		Id:   user.GetId(),
-		Name: user.GetName(),
+		Id:     user.GetId(),
+		Name:   user.GetName(),
+		Colour: user.GetColour(),
 	}
 }

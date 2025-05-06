@@ -7,23 +7,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { AlertCircle, Home, Plus } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
-// Generate a vibrant color based on the user id
-function getColorForUser(userId: number) {
-  const colors = [
-    "bg-red-500",
-    "bg-blue-500",
-    "bg-green-500",
-    "bg-yellow-500",
-    "bg-purple-500",
-    "bg-pink-500",
-    "bg-indigo-500",
-    "bg-teal-500",
-  ];
-  
-  return colors[userId % colors.length];
-}
-
-// Generate a pastel color based on the plant id
+// Generate a vibrant color based on the plant id
 function getColorForPlant(plantId: number) {
   const colors = [
     "bg-green-200",
@@ -37,19 +21,6 @@ function getColorForPlant(plantId: number) {
   ];
   
   return colors[plantId % colors.length];
-}
-
-function ErrorMessage({ message }: { message: string }) {
-  return (
-    <Alert variant="destructive" className="mb-6">
-      <AlertCircle className="h-4 w-4" />
-      <AlertTitle>Error</AlertTitle>
-      <AlertDescription>
-        {message}
-        <p className="mt-2">Please check that the API server is running at http://localhost:8080</p>
-      </AlertDescription>
-    </Alert>
-  );
 }
 
 function PlantsList({ plants }: { plants: Plant[] }) {
@@ -83,6 +54,19 @@ function PlantsList({ plants }: { plants: Plant[] }) {
   );
 }
 
+function ErrorMessage({ message }: { message: string }) {
+  return (
+    <Alert variant="destructive" className="mb-6">
+      <AlertCircle className="h-4 w-4" />
+      <AlertTitle>Error</AlertTitle>
+      <AlertDescription>
+        {message}
+        <p className="mt-2">Please check that the API server is running at http://localhost:8080</p>
+      </AlertDescription>
+    </Alert>
+  );
+}
+
 export default async function UserPage({ params }: { params: { id: string } }) {
   const {id} = await params;
   const userResult = await usersService.getUserById(id);
@@ -102,7 +86,7 @@ export default async function UserPage({ params }: { params: { id: string } }) {
       <Card className="max-w-md w-full">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
-            <Avatar className={`${getColorForUser(user.id)} w-24 h-24`}>
+            <Avatar className="w-24 h-24" style={{ backgroundColor: user.colour }}>
               <AvatarFallback className="text-white text-3xl font-bold">
                 {user.name.charAt(0)}
               </AvatarFallback>

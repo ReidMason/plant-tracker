@@ -1,8 +1,9 @@
 package usersStore
 
 type User struct {
-	name string
-	id   int
+	name   string
+	id     int
+	colour string
 }
 
 func (u *User) GetId() int {
@@ -11,4 +12,8 @@ func (u *User) GetId() int {
 
 func (u *User) GetName() string {
 	return u.name
+}
+
+func (u *User) GetColour() string {
+	return u.colour
 }

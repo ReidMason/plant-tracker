@@ -3,6 +3,7 @@ import BaseApi, { Result, createSuccessResult, createErrorResult } from './api';
 export interface User {
   id: number;
   name: string;
+  colour: string;
 }
 
 export interface CreateUserRequest {

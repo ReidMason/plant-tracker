@@ -3,7 +3,7 @@ package usersStore
 type UsersStore interface {
 	GetUsers() []User
 	GetUserByID(id int) *User
-	CreateUser(name string) User
+	CreateUser(name string, colour string) User
 }
 
 type InMemoryUsersStore struct {
@@ -14,9 +14,9 @@ type InMemoryUsersStore struct {
 func NewInMemoryUsersStore() *InMemoryUsersStore {
 	return &InMemoryUsersStore{
 		users: []User{
-			{id: 1, name: "John Doe"},
-			{id: 2, name: "Jane Smith"},
-			{id: 3, name: "Alice Johnson"},
+			{id: 1, name: "John Doe", colour: "#F44336"},
+			{id: 2, name: "Jane Smith", colour: "#2196F3"},
+			{id: 3, name: "Alice Johnson", colour: "#4CAF50"},
 		},
 		nextId: 4, // Start IDs after the initial users
 	}
@@ -35,10 +35,11 @@ func (s *InMemoryUsersStore) GetUserByID(id int) *User {
 	return nil
 }
 
-func (s *InMemoryUsersStore) CreateUser(name string) User {
+func (s *InMemoryUsersStore) CreateUser(name string, colour string) User {
 	newUser := User{
-		id:   s.nextId,
-		name: name,
+		id:     s.nextId,
+		name:   name,
+		colour: colour,
 	}
 
 	s.users = append(s.users, newUser)

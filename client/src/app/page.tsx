@@ -6,22 +6,6 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { AlertCircle, Plus } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
-// Generate a vibrant color based on the user id
-function getColorForUser(userId: number) {
-  const colors = [
-    "bg-red-500",
-    "bg-blue-500",
-    "bg-green-500",
-    "bg-yellow-500",
-    "bg-purple-500",
-    "bg-pink-500",
-    "bg-indigo-500",
-    "bg-teal-500",
-  ];
-  
-  return colors[userId % colors.length];
-}
-
 function UserList({ users }: { users: User[] }) {
   if (users.length === 0) {
     return <div className="text-lg text-muted-foreground">No users found.</div>;
@@ -35,7 +19,7 @@ function UserList({ users }: { users: User[] }) {
           key={user.id}
           className="flex flex-col items-center group transition-transform hover:scale-105"
         >
-          <Avatar className={`${getColorForUser(user.id)} w-16 h-16 transition-shadow group-hover:shadow-lg`}>
+          <Avatar className="w-16 h-16 transition-shadow group-hover:shadow-lg" style={{ backgroundColor: user.colour }}>
             <AvatarFallback className="text-white text-xl font-bold">
               {user.name.charAt(0)}
             </AvatarFallback>
