@@ -70,6 +70,13 @@ class BaseApi {
       const response = await fetch(url, config);
 
       if (!response.ok) {
+        let errorBody;
+        try {
+          errorBody = await response.text();
+          console.error(`API error response for ${url}:`, errorBody);
+        } catch (e) {
+          console.error(`Failed to read error response for ${url}:`, e);
+        }
         return createErrorResult<T>(`API error: ${response.status} ${response.statusText}`);
       }
 
