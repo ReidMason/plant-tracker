@@ -33,7 +33,7 @@ func (u *usersHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	switch r.Method {
 	case "GET":
-		users, err := u.usersService.GetUsers()
+		users, err := u.usersService.GetUsers(r.Context())
 		if err != nil {
 			apiResponse.InternalServerError[any](w, []string{"Failed to get users"})
 			return
@@ -58,9 +58,10 @@ func (u *usersHandler) handleSingleUser(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
+	ctx := r.Context()
 	switch r.Method {
 	case "GET":
-		user, err := u.usersService.GetUserById(int64(userId))
+		user, err := u.usersService.GetUserById(ctx, int64(userId))
 		if err != nil {
 			apiResponse.InternalServerError[any](w, []string{"Failed to get user"})
 			return
@@ -103,7 +104,8 @@ func (u *usersHandler) handleCreateUser(w http.ResponseWriter, r *http.Request) 
 	}
 
 	// Create user
-	newUser, err := u.usersService.CreateUser(createUserDto.Name)
+	ctx := r.Context()
+	newUser, err := u.usersService.CreateUser(ctx, createUserDto.Name)
 	if err != nil {
 		fmt.Println(err)
 		apiResponse.InternalServerError[any](w, []string{"Failed to create user"})

@@ -58,9 +58,10 @@ func (p *plantsHandler) handleUserPlants(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
+	ctx := r.Context()
 	switch r.Method {
 	case "GET":
-		plants, err := p.plantsService.GetPlantsByUserId(int64(userId))
+		plants, err := p.plantsService.GetPlantsByUserId(ctx, int64(userId))
 		if err != nil {
 			apiResponse.InternalServerError[any](w, []string{"Failed to get plant"})
 			return
@@ -90,9 +91,10 @@ func (p *plantsHandler) handleSingleUserPlant(w http.ResponseWriter, r *http.Req
 		return
 	}
 
+	ctx := r.Context()
 	switch r.Method {
 	case "GET":
-		plant, err := p.plantsService.GetPlantById(int64(plantId))
+		plant, err := p.plantsService.GetPlantById(ctx, int64(plantId))
 		if err != nil {
 			apiResponse.InternalServerError[any](w, []string{"Failed to get plant"})
 			return
@@ -138,8 +140,9 @@ func (p *plantsHandler) handleCreatePlant(w http.ResponseWriter, r *http.Request
 	// Set the userId from the URL parameter
 	createPlantDto.UserId = userId
 
+	ctx := r.Context()
 	// Create plant
-	newPlant, err := p.plantsService.CreatePlant(createPlantDto.Name, int64(createPlantDto.UserId))
+	newPlant, err := p.plantsService.CreatePlant(ctx, createPlantDto.Name, int64(createPlantDto.UserId))
 	if err != nil {
 		apiResponse.InternalServerError[any](w, []string{"Failed to create plant"})
 		return

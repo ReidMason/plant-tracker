@@ -8,33 +8,31 @@ import (
 )
 
 type GetPlantsService interface {
-	GetPlantsByUserId(userId int64) ([]database.Plant, error)
-	GetPlantById(id int64) (database.Plant, error)
-	CreatePlant(name string, userId int64) (database.Plant, error)
+	GetPlantsByUserId(ctx context.Context, userId int64) ([]database.Plant, error)
+	GetPlantById(ctx context.Context, id int64) (database.Plant, error)
+	CreatePlant(ctx context.Context, name string, userId int64) (database.Plant, error)
 }
 
 type PlantsService struct {
 	plantsStore plantstore.PlantsStore
-	ctx         context.Context
 }
 
-func New(ctx context.Context, plantsStore plantstore.PlantsStore) *PlantsService {
+func New(plantsStore plantstore.PlantsStore) *PlantsService {
 	return &PlantsService{
 		plantsStore: plantsStore,
-		ctx:         ctx,
 	}
 }
 
-func (p *PlantsService) GetPlantsByUserId(userId int64) ([]database.Plant, error) {
-	return p.plantsStore.GetPlantsByUserId(p.ctx, userId)
+func (p *PlantsService) GetPlantsByUserId(ctx context.Context, userId int64) ([]database.Plant, error) {
+	return p.plantsStore.GetPlantsByUserId(ctx, userId)
 }
 
-func (p *PlantsService) GetPlantById(id int64) (database.Plant, error) {
-	return p.plantsStore.GetPlantById(p.ctx, id)
+func (p *PlantsService) GetPlantById(ctx context.Context, id int64) (database.Plant, error) {
+	return p.plantsStore.GetPlantById(ctx, id)
 }
 
-func (p *PlantsService) CreatePlant(name string, userId int64) (database.Plant, error) {
-	return p.plantsStore.CreatePlant(p.ctx, database.CreatePlantParams{
+func (p *PlantsService) CreatePlant(ctx context.Context, name string, userId int64) (database.Plant, error) {
+	return p.plantsStore.CreatePlant(ctx, database.CreatePlantParams{
 		Name:   name,
 		Userid: userId,
 	})

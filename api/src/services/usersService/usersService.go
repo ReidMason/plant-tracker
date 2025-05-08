@@ -36,33 +36,31 @@ func GetRandomColour() string {
 }
 
 type GetUsersService interface {
-	GetUsers() ([]database.User, error)
-	GetUserById(id int64) (database.User, error)
-	CreateUser(name string) (database.User, error)
+	GetUsers(ctx context.Context) ([]database.User, error)
+	GetUserById(ctx context.Context, id int64) (database.User, error)
+	CreateUser(ctx context.Context, name string) (database.User, error)
 }
 
 type UsersService struct {
 	usersStore usersStore.UsersStore
-	ctx        context.Context
 }
 
-func New(ctx context.Context, usersStore usersStore.UsersStore) *UsersService {
+func New(usersStore usersStore.UsersStore) *UsersService {
 	return &UsersService{
 		usersStore: usersStore,
-		ctx:        ctx,
 	}
 }
 
-func (u *UsersService) GetUsers() ([]database.User, error) {
-	return u.usersStore.GetUsers(u.ctx)
+func (u *UsersService) GetUsers(ctx context.Context) ([]database.User, error) {
+	return u.usersStore.GetUsers(ctx)
 }
 
-func (u *UsersService) GetUserById(id int64) (database.User, error) {
-	return u.usersStore.GetUserById(u.ctx, id)
+func (u *UsersService) GetUserById(ctx context.Context, id int64) (database.User, error) {
+	return u.usersStore.GetUserById(ctx, id)
 }
 
-func (u *UsersService) CreateUser(name string) (database.User, error) {
-	return u.usersStore.CreateUser(u.ctx, database.CreateUserParams{
+func (u *UsersService) CreateUser(ctx context.Context, name string) (database.User, error) {
+	return u.usersStore.CreateUser(ctx, database.CreateUserParams{
 		Name:   name,
 		Colour: GetRandomColour(),
 	})

@@ -10,31 +10,29 @@ import (
 )
 
 type EventsService interface {
-	GetEventsByPlantId(plantId int64) ([]database.Event, error)
-	CreateWateringEvent(plantId int64, note string) (database.Event, error)
-	GetEventById(id int64) (database.Event, error)
+	GetEventsByPlantId(ctx context.Context, plantId int64) ([]database.Event, error)
+	CreateWateringEvent(ctx context.Context, plantId int64, note string) (database.Event, error)
+	GetEventById(ctx context.Context, id int64) (database.Event, error)
 }
 
 type eventsService struct {
-	ctx         context.Context
 	eventsStore eventsStore.EventsStore
 	plantsStore plantsStore.PlantsStore
 }
 
-func New(ctx context.Context, eventsStore eventsStore.EventsStore, plantsStore plantsStore.PlantsStore) *eventsService {
+func New(eventsStore eventsStore.EventsStore, plantsStore plantsStore.PlantsStore) *eventsService {
 	return &eventsService{
-		ctx:         ctx,
 		eventsStore: eventsStore,
 		plantsStore: plantsStore,
 	}
 }
 
-func (s *eventsService) GetEventsByPlantId(plantId int64) ([]database.Event, error) {
-	return s.eventsStore.GetEventsByPlantId(s.ctx, plantId)
+func (s *eventsService) GetEventsByPlantId(ctx context.Context, plantId int64) ([]database.Event, error) {
+	return s.eventsStore.GetEventsByPlantId(ctx, plantId)
 }
 
-func (s *eventsService) CreateWateringEvent(plantId int64, note string) (database.Event, error) {
-	plant, err := s.plantsStore.GetPlantById(s.ctx, plantId)
+func (s *eventsService) CreateWateringEvent(ctx context.Context, plantId int64, note string) (database.Event, error) {
+	plant, err := s.plantsStore.GetPlantById(ctx, plantId)
 	if err != nil {
 		return database.Event{}, err
 	}
@@ -44,7 +42,7 @@ func (s *eventsService) CreateWateringEvent(plantId int64, note string) (databas
 	}
 
 	var wateringEventTypeId int32 = 1
-	return s.eventsStore.CreateEvent(s.ctx, database.CreateEventParams{
+	return s.eventsStore.CreateEvent(ctx, database.CreateEventParams{
 		Plantid:   plantId,
 		Eventtype: wateringEventTypeId,
 		Note:      "",
@@ -52,8 +50,8 @@ func (s *eventsService) CreateWateringEvent(plantId int64, note string) (databas
 	})
 }
 
-func (s *eventsService) GetEventById(id int64) (database.Event, error) {
-	return s.eventsStore.GetEventById(s.ctx, id)
+func (s *eventsService) GetEventById(ctx context.Context, id int64) (database.Event, error) {
+	return s.eventsStore.GetEventById(ctx, id)
 }
 
 type plantsError string

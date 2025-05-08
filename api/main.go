@@ -88,9 +88,9 @@ func main() {
 	queries := database.New(conn)
 
 	// Set up services
-	userService := usersService.New(ctx, queries)
-	plantService := plantsService.New(ctx, queries)
-	eventService := eventsService.New(ctx, queries, queries)
+	userService := usersService.New(queries)
+	plantService := plantsService.New(queries)
+	eventService := eventsService.New(queries, queries)
 
 	mux.Handle("/users", usersHandler.New(userService))
 	mux.Handle("/users/{id}", usersHandler.New(userService))

@@ -55,10 +55,11 @@ func (h *eventsHandler) handlePlantEvents(w http.ResponseWriter, r *http.Request
 		return
 	}
 
+	ctx := r.Context()
 	switch r.Method {
 	case "GET":
 		// Get events for the plant
-		events, err := h.eventsService.GetEventsByPlantId(int64(plantId))
+		events, err := h.eventsService.GetEventsByPlantId(ctx, int64(plantId))
 		if err != nil {
 			apiResponse.InternalServerError[any](w, []string{"Failed to get events"})
 			return
@@ -94,7 +95,8 @@ func (h *eventsHandler) handleCreateEvent(w http.ResponseWriter, r *http.Request
 	createEventDto.PlantId = plantId
 
 	// Create watering event
-	newEvent, err := h.eventsService.CreateWateringEvent(int64(createEventDto.PlantId), createEventDto.Note)
+	ctx := r.Context()
+	newEvent, err := h.eventsService.CreateWateringEvent(ctx, int64(createEventDto.PlantId), createEventDto.Note)
 	if err != nil {
 		apiResponse.InternalServerError[any](w, []string{"Failed to create event"})
 		return
