@@ -1,31 +1,41 @@
 package plantsService
 
-import plantstore "github.com/ReidMason/plant-tracker/src/stores/plantsStore"
+import (
+	"context"
+
+	"github.com/ReidMason/plant-tracker/src/stores/database"
+	plantstore "github.com/ReidMason/plant-tracker/src/stores/plantsStore"
+)
 
 type GetPlantsService interface {
-	GetPlantsByUserId(userId int) []plantstore.Plant
-	GetPlantById(id int) *plantstore.Plant
-	CreatePlant(name string, userId int) plantstore.Plant
+	GetPlantsByUserId(userId int64) ([]database.Plant, error)
+	GetPlantById(id int64) (database.Plant, error)
+	CreatePlant(name string, userId int64) (database.Plant, error)
 }
 
 type PlantsService struct {
 	plantsStore plantstore.PlantsStore
+	ctx         context.Context
 }
 
-func New(plantsStore plantstore.PlantsStore) *PlantsService {
+func New(ctx context.Context, plantsStore plantstore.PlantsStore) *PlantsService {
 	return &PlantsService{
 		plantsStore: plantsStore,
+		ctx:         ctx,
 	}
 }
 
-func (p *PlantsService) GetPlantsByUserId(userId int) []plantstore.Plant {
-	return p.plantsStore.GetPlantsByUserId(userId)
+func (p *PlantsService) GetPlantsByUserId(userId int64) ([]database.Plant, error) {
+	return p.plantsStore.GetPlantsByUserId(p.ctx, userId)
 }
 
-func (p *PlantsService) GetPlantById(id int) *plantstore.Plant {
-	return p.plantsStore.GetPlantById(id)
+func (p *PlantsService) GetPlantById(id int64) (database.Plant, error) {
+	return p.plantsStore.GetPlantById(p.ctx, id)
 }
 
-func (p *PlantsService) CreatePlant(name string, userId int) plantstore.Plant {
-	return p.plantsStore.CreatePlant(name, userId)
+func (p *PlantsService) CreatePlant(name string, userId int64) (database.Plant, error) {
+	return p.plantsStore.CreatePlant(p.ctx, database.CreatePlantParams{
+		Name:   name,
+		Userid: userId,
+	})
 }

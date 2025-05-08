@@ -9,23 +9,16 @@ import (
 
 	"github.com/ReidMason/plant-tracker/src/httpHandlers/eventsHandler/eventDtos"
 	apiResponse "github.com/ReidMason/plant-tracker/src/httpHandlers/models"
-	eventsStore "github.com/ReidMason/plant-tracker/src/stores/eventsStore"
+	"github.com/ReidMason/plant-tracker/src/services/eventsService"
 )
-
-// EventsHandlerService defines the interface for the events service used by the handler
-type EventsHandlerService interface {
-	GetEventsByPlantId(plantId int) []eventsStore.Event
-	CreateWateringEvent(plantId int, note string) (eventsStore.Event, error)
-	GetEventById(id int) *eventsStore.Event
-}
 
 // eventsHandler implements the HTTP handler for events
 type eventsHandler struct {
-	eventsService EventsHandlerService
+	eventsService eventsService.EventsService
 }
 
 // New creates a new events handler
-func New(eventsService EventsHandlerService) *eventsHandler {
+func New(eventsService eventsService.EventsService) *eventsHandler {
 	return &eventsHandler{
 		eventsService: eventsService,
 	}
@@ -56,7 +49,7 @@ func (h *eventsHandler) handlePlantEvents(w http.ResponseWriter, r *http.Request
 
 	// Get plant ID from the URL
 	plantIDStr := parts[4]
-	plantID, err := strconv.Atoi(plantIDStr)
+	plantId, err := strconv.Atoi(plantIDStr)
 	if err != nil {
 		apiResponse.NotFound(w)
 		return
@@ -65,11 +58,15 @@ func (h *eventsHandler) handlePlantEvents(w http.ResponseWriter, r *http.Request
 	switch r.Method {
 	case "GET":
 		// Get events for the plant
-		events := h.eventsService.GetEventsByPlantId(plantID)
+		events, err := h.eventsService.GetEventsByPlantId(int64(plantId))
+		if err != nil {
+			apiResponse.InternalServerError[any](w, []string{"Failed to get events"})
+			return
+		}
 		apiResponse.Ok(w, eventDtos.FromStoreEvents(events))
 	case "POST":
 		// Create a new event for the plant
-		h.handleCreateEvent(w, r, plantID)
+		h.handleCreateEvent(w, r, plantId)
 	default:
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 	}
@@ -97,9 +94,9 @@ func (h *eventsHandler) handleCreateEvent(w http.ResponseWriter, r *http.Request
 	createEventDto.PlantId = plantId
 
 	// Create watering event
-	newEvent, err := h.eventsService.CreateWateringEvent(createEventDto.PlantId, createEventDto.Note)
+	newEvent, err := h.eventsService.CreateWateringEvent(int64(createEventDto.PlantId), createEventDto.Note)
 	if err != nil {
-		apiResponse.NotFound(w)
+		apiResponse.InternalServerError[any](w, []string{"Failed to create event"})
 		return
 	}
 

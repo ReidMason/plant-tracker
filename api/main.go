@@ -17,8 +17,6 @@ import (
 	plantsService "github.com/ReidMason/plant-tracker/src/services/plantsService"
 	usersService "github.com/ReidMason/plant-tracker/src/services/usersService"
 	"github.com/ReidMason/plant-tracker/src/stores/database"
-	eventsStore "github.com/ReidMason/plant-tracker/src/stores/eventsStore"
-	plantstore "github.com/ReidMason/plant-tracker/src/stores/plantsStore"
 	"github.com/jackc/pgx/v5"
 	"github.com/joho/godotenv"
 	"github.com/pressly/goose/v3"
@@ -89,14 +87,10 @@ func main() {
 
 	queries := database.New(conn)
 
-	// Set up stores
-	plantStore := plantstore.NewInMemoryPlantsStore()
-	eventStore := eventsStore.NewInMemoryEventsStore()
-
 	// Set up services
 	userService := usersService.New(ctx, queries)
-	plantService := plantsService.New(plantStore)
-	eventService := eventsService.New(eventStore, plantStore)
+	plantService := plantsService.New(ctx, queries)
+	eventService := eventsService.New(ctx, queries, queries)
 
 	mux.Handle("/users", usersHandler.New(userService))
 	mux.Handle("/users/{id}", usersHandler.New(userService))

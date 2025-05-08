@@ -10,20 +10,15 @@ import (
 
 	apiResponse "github.com/ReidMason/plant-tracker/src/httpHandlers/models"
 	"github.com/ReidMason/plant-tracker/src/httpHandlers/plantsHandler/plantDtos"
-	plantstore "github.com/ReidMason/plant-tracker/src/stores/plantsStore"
+	"github.com/ReidMason/plant-tracker/src/services/plantsService"
+	"github.com/ReidMason/plant-tracker/src/stores/database"
 )
 
-type PlantsHandlerService interface {
-	GetPlantsByUserId(userId int) []plantstore.Plant
-	GetPlantById(id int) *plantstore.Plant
-	CreatePlant(name string, userId int) plantstore.Plant
-}
-
 type plantsHandler struct {
-	plantsService PlantsHandlerService
+	plantsService plantsService.GetPlantsService
 }
 
-func New(plantsService PlantsHandlerService) *plantsHandler {
+func New(plantsService plantsService.GetPlantsService) *plantsHandler {
 	return &plantsHandler{
 		plantsService: plantsService,
 	}
@@ -57,7 +52,7 @@ func (p *plantsHandler) handleUserPlants(w http.ResponseWriter, r *http.Request)
 	}
 
 	userIDStr := parts[2]
-	userID, err := strconv.Atoi(userIDStr)
+	userId, err := strconv.Atoi(userIDStr)
 	if err != nil {
 		apiResponse.NotFound(w)
 		return
@@ -65,10 +60,14 @@ func (p *plantsHandler) handleUserPlants(w http.ResponseWriter, r *http.Request)
 
 	switch r.Method {
 	case "GET":
-		plants := p.plantsService.GetPlantsByUserId(userID)
+		plants, err := p.plantsService.GetPlantsByUserId(int64(userId))
+		if err != nil {
+			apiResponse.InternalServerError[any](w, []string{"Failed to get plant"})
+			return
+		}
 		apiResponse.Ok(w, plantDtos.FromStorePlants(plants))
 	case "POST":
-		p.handleCreatePlant(w, r, userID)
+		p.handleCreatePlant(w, r, userId)
 	default:
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 	}
@@ -85,7 +84,7 @@ func (p *plantsHandler) handleSingleUserPlant(w http.ResponseWriter, r *http.Req
 	// Extract plantId (we don't need userId for this operation)
 	plantIDStr := parts[4]
 
-	plantID, err := strconv.Atoi(plantIDStr)
+	plantId, err := strconv.Atoi(plantIDStr)
 	if err != nil {
 		apiResponse.NotFound(w)
 		return
@@ -93,12 +92,17 @@ func (p *plantsHandler) handleSingleUserPlant(w http.ResponseWriter, r *http.Req
 
 	switch r.Method {
 	case "GET":
-		plant := p.plantsService.GetPlantById(plantID)
-		if plant == nil {
+		plant, err := p.plantsService.GetPlantById(int64(plantId))
+		if err != nil {
+			apiResponse.InternalServerError[any](w, []string{"Failed to get plant"})
+			return
+		}
+
+		if plant == (database.Plant{}) {
 			apiResponse.NotFound(w)
 			return
 		}
-		apiResponse.Ok(w, plantDtos.FromStorePlant(*plant))
+		apiResponse.Ok(w, plantDtos.FromStorePlant(plant))
 	case "PUT":
 		fmt.Fprintln(w, "PUT /users/{userId}/plants/{plantId}")
 	case "DELETE":
@@ -135,7 +139,11 @@ func (p *plantsHandler) handleCreatePlant(w http.ResponseWriter, r *http.Request
 	createPlantDto.UserId = userId
 
 	// Create plant
-	newPlant := p.plantsService.CreatePlant(createPlantDto.Name, createPlantDto.UserId)
+	newPlant, err := p.plantsService.CreatePlant(createPlantDto.Name, int64(createPlantDto.UserId))
+	if err != nil {
+		apiResponse.InternalServerError[any](w, []string{"Failed to create plant"})
+		return
+	}
 
 	// Return created plant
 	apiResponse.Created(w, plantDtos.FromStorePlant(newPlant))

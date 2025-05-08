@@ -1,14 +1,16 @@
 package plantDtos
 
-import plantstore "github.com/ReidMason/plant-tracker/src/stores/plantsStore"
+import (
+	"github.com/ReidMason/plant-tracker/src/stores/database"
+)
 
 type PlantResponseDto struct {
-	Id     int    `json:"id"`
-	UserId int    `json:"userId"`
+	Id     int64  `json:"id"`
+	UserId int64  `json:"userId"`
 	Name   string `json:"name"`
 }
 
-func FromStorePlants(plants []plantstore.Plant) []*PlantResponseDto {
+func FromStorePlants(plants []database.Plant) []*PlantResponseDto {
 	plantsDto := make([]*PlantResponseDto, len(plants))
 	for i, plant := range plants {
 		plantsDto[i] = FromStorePlant(plant)
@@ -17,10 +19,10 @@ func FromStorePlants(plants []plantstore.Plant) []*PlantResponseDto {
 	return plantsDto
 }
 
-func FromStorePlant(plant plantstore.Plant) *PlantResponseDto {
+func FromStorePlant(plant database.Plant) *PlantResponseDto {
 	return &PlantResponseDto{
-		Id:     plant.GetId(),
-		UserId: plant.GetUserId(),
-		Name:   plant.GetName(),
+		Id:     plant.ID,
+		UserId: plant.Userid,
+		Name:   plant.Name,
 	}
 }

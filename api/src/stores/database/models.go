@@ -4,6 +4,29 @@
 
 package database
 
+import (
+	"time"
+)
+
+type Event struct {
+	ID        int64
+	Plantid   int64
+	Eventtype int32
+	Note      string
+	Timestamp time.Time
+}
+
+type Eventtype struct {
+	ID   int32
+	Name string
+}
+
+type Plant struct {
+	ID     int64
+	Name   string
+	Userid int64
+}
+
 type User struct {
 	ID     int64
 	Name   string
