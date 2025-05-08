@@ -45,12 +45,19 @@ export default function PlantListWithWatering({ plants, userId }: PlantListWithW
           >
             <div className="flex items-center mb-2">
               <div className="flex-grow">
-                <h3 className="font-medium">{plant.name}</h3>
-                <LastWateredDisplay
-                  userId={userId}
-                  plantId={plant.id}
-                  refreshTrigger={refreshTriggers[plant.id]}
-                />
+                <div className="flex items-center gap-2">
+                  <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-green-100 text-2xl mr-2">
+                    🌱
+                  </span>
+                  <div>
+                    <h3 className="font-medium">{plant.name}</h3>
+                    <LastWateredDisplay
+                      userId={userId}
+                      plantId={plant.id}
+                      refreshTrigger={refreshTriggers[plant.id]}
+                    />
+                  </div>
+                </div>
               </div>
               <WaterPlantButton
                 userId={userId}
