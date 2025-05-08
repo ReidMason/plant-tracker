@@ -17,7 +17,7 @@ import (
 	plantsService "github.com/ReidMason/plant-tracker/src/services/plantsService"
 	usersService "github.com/ReidMason/plant-tracker/src/services/usersService"
 	"github.com/ReidMason/plant-tracker/src/stores/database"
-	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/joho/godotenv"
 	"github.com/pressly/goose/v3"
 )
@@ -78,14 +78,14 @@ func main() {
 		panic(err)
 	}
 
-	// Open pgx.Conn for sqlc/database
-	conn, err := pgx.Connect(ctx, connectionString)
+	// Open pgxpool.Pool for sqlc/database
+	pool, err := pgxpool.New(ctx, connectionString)
 	if err != nil {
-		panic("Failed to connect to database (pgx)")
+		panic("Failed to connect to database (pgxpool)")
 	}
-	defer conn.Close(ctx)
+	defer pool.Close()
 
-	queries := database.New(conn)
+	queries := database.New(pool)
 
 	// Set up services
 	userService := usersService.New(queries)
