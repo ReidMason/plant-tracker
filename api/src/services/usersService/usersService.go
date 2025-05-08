@@ -1,9 +1,11 @@
 package usersService
 
 import (
+	"context"
 	"math/rand"
 	"time"
 
+	"github.com/ReidMason/plant-tracker/src/stores/database"
 	usersStore "github.com/ReidMason/plant-tracker/src/stores/usersStore"
 )
 
@@ -34,31 +36,34 @@ func GetRandomColour() string {
 }
 
 type GetUsersService interface {
-	GetUsers() []usersStore.User
-	GetUserByID(id int) *usersStore.User
-	CreateUser(name string) usersStore.User
+	GetUsers() ([]database.User, error)
+	GetUserById(id int64) (database.User, error)
+	CreateUser(name string) (database.User, error)
 }
 
 type UsersService struct {
 	usersStore usersStore.UsersStore
+	ctx        context.Context
 }
 
-func New(usersStore usersStore.UsersStore) *UsersService {
+func New(ctx context.Context, usersStore usersStore.UsersStore) *UsersService {
 	return &UsersService{
 		usersStore: usersStore,
+		ctx:        ctx,
 	}
 }
 
-func (u *UsersService) GetUsers() []usersStore.User {
-	return u.usersStore.GetUsers()
+func (u *UsersService) GetUsers() ([]database.User, error) {
+	return u.usersStore.GetUsers(u.ctx)
 }
 
-func (u *UsersService) GetUserByID(id int) *usersStore.User {
-	return u.usersStore.GetUserByID(id)
+func (u *UsersService) GetUserById(id int64) (database.User, error) {
+	return u.usersStore.GetUserById(u.ctx, id)
 }
 
-func (u *UsersService) CreateUser(name string) usersStore.User {
-	// Generate a random colour for the new user
-	colour := GetRandomColour()
-	return u.usersStore.CreateUser(name, colour)
+func (u *UsersService) CreateUser(name string) (database.User, error) {
+	return u.usersStore.CreateUser(u.ctx, database.CreateUserParams{
+		Name:   name,
+		Colour: GetRandomColour(),
+	})
 }

@@ -10,20 +10,15 @@ import (
 
 	apiResponse "github.com/ReidMason/plant-tracker/src/httpHandlers/models"
 	"github.com/ReidMason/plant-tracker/src/httpHandlers/usersHandler/userDtos"
-	usersStore "github.com/ReidMason/plant-tracker/src/stores/usersStore"
+	"github.com/ReidMason/plant-tracker/src/services/usersService"
+	"github.com/ReidMason/plant-tracker/src/stores/database"
 )
 
-type UsersHandlerService interface {
-	GetUsers() []usersStore.User
-	GetUserByID(id int) *usersStore.User
-	CreateUser(name string) usersStore.User
-}
-
 type usersHandler struct {
-	usersService UsersHandlerService
+	usersService usersService.GetUsersService
 }
 
-func New(usersService UsersHandlerService) *usersHandler {
+func New(usersService usersService.GetUsersService) *usersHandler {
 	return &usersHandler{
 		usersService: usersService,
 	}
@@ -38,7 +33,11 @@ func (u *usersHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	switch r.Method {
 	case "GET":
-		users := u.usersService.GetUsers()
+		users, err := u.usersService.GetUsers()
+		if err != nil {
+			apiResponse.InternalServerError[any](w, []string{"Failed to get users"})
+			return
+		}
 		apiResponse.Ok(w, userDtos.FromStoreUsers(users))
 	case "POST":
 		u.handleCreateUser(w, r)
@@ -53,7 +52,7 @@ func (u *usersHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 func (u *usersHandler) handleSingleUser(w http.ResponseWriter, r *http.Request) {
 	userIDStr := r.PathValue("id")
-	userID, err := strconv.Atoi(userIDStr)
+	userId, err := strconv.Atoi(userIDStr)
 	if err != nil {
 		apiResponse.NotFound(w)
 		return
@@ -61,12 +60,16 @@ func (u *usersHandler) handleSingleUser(w http.ResponseWriter, r *http.Request) 
 
 	switch r.Method {
 	case "GET":
-		user := u.usersService.GetUserByID(userID)
-		if user == nil {
+		user, err := u.usersService.GetUserById(int64(userId))
+		if err != nil {
+			apiResponse.InternalServerError[any](w, []string{"Failed to get user"})
+			return
+		}
+		if user == (database.User{}) {
 			apiResponse.NotFound(w)
 			return
 		}
-		apiResponse.Ok(w, userDtos.FromStoreUser(*user))
+		apiResponse.Ok(w, userDtos.FromStoreUser(user))
 	case "PUT":
 		fmt.Fprintln(w, "PUT /users/{id}")
 	case "DELETE":
@@ -100,6 +103,11 @@ func (u *usersHandler) handleCreateUser(w http.ResponseWriter, r *http.Request) 
 	}
 
 	// Create user
-	newUser := u.usersService.CreateUser(createUserDto.Name)
+	newUser, err := u.usersService.CreateUser(createUserDto.Name)
+	if err != nil {
+		fmt.Println(err)
+		apiResponse.InternalServerError[any](w, []string{"Failed to create user"})
+		return
+	}
 	apiResponse.Created(w, userDtos.FromStoreUser(newUser))
 }

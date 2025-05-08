@@ -1,7 +1,14 @@
 package main
 
 import (
+	"context"
+	"embed"
 	"net/http"
+	"os"
+
+	"database/sql"
+
+	_ "github.com/lib/pq"
 
 	"github.com/ReidMason/plant-tracker/src/httpHandlers/eventsHandler"
 	plantsHandler "github.com/ReidMason/plant-tracker/src/httpHandlers/plantsHandler"
@@ -9,9 +16,12 @@ import (
 	eventsService "github.com/ReidMason/plant-tracker/src/services/eventsService"
 	plantsService "github.com/ReidMason/plant-tracker/src/services/plantsService"
 	usersService "github.com/ReidMason/plant-tracker/src/services/usersService"
+	"github.com/ReidMason/plant-tracker/src/stores/database"
 	eventsStore "github.com/ReidMason/plant-tracker/src/stores/eventsStore"
 	plantstore "github.com/ReidMason/plant-tracker/src/stores/plantsStore"
-	usersStore "github.com/ReidMason/plant-tracker/src/stores/usersStore"
+	"github.com/jackc/pgx/v5"
+	"github.com/joho/godotenv"
+	"github.com/pressly/goose/v3"
 )
 
 func corsMiddleware(next http.Handler) http.Handler {
@@ -29,16 +39,62 @@ func corsMiddleware(next http.Handler) http.Handler {
 	})
 }
 
+//go:embed migrations/*.sql
+var embedMigrations embed.FS
+
 func main() {
+	err := godotenv.Load()
+	if err != nil {
+		panic("Error loading .env file")
+	}
+
 	mux := http.NewServeMux()
 
+	// Database connection
+	ctx := context.Background()
+
+	connectionString := os.Getenv("CONNECTION_STRING")
+	if connectionString == "" {
+		panic("CONNECTION_STRING environment variable not set")
+	}
+
+	// Open *sql.DB for goose migrations
+	sqldb, err := sql.Open("postgres", connectionString)
+	if err != nil {
+		panic(err)
+	}
+	defer sqldb.Close()
+
+	if err := sqldb.PingContext(ctx); err != nil {
+		panic("Failed to connect to database")
+	}
+
+	// Database migrations
+	goose.SetBaseFS(embedMigrations)
+
+	if err := goose.SetDialect("postgres"); err != nil {
+		panic(err)
+	}
+
+	if err := goose.Up(sqldb, "migrations"); err != nil {
+		panic(err)
+	}
+
+	// Open pgx.Conn for sqlc/database
+	conn, err := pgx.Connect(ctx, connectionString)
+	if err != nil {
+		panic("Failed to connect to database (pgx)")
+	}
+	defer conn.Close(ctx)
+
+	queries := database.New(conn)
+
 	// Set up stores
-	userStore := usersStore.NewInMemoryUsersStore()
 	plantStore := plantstore.NewInMemoryPlantsStore()
 	eventStore := eventsStore.NewInMemoryEventsStore()
 
 	// Set up services
-	userService := usersService.New(userStore)
+	userService := usersService.New(ctx, queries)
 	plantService := plantsService.New(plantStore)
 	eventService := eventsService.New(eventStore, plantStore)
 
