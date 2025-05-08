@@ -1,9 +1,13 @@
 import BaseApi, { Result } from './api';
 
+export enum EventType {
+  water
+}
+
 export interface Event {
   id: number;
   plantId: number;
-  type: string;
+  typeId: EventType;
   note: string;
   timestamp: string;
 }

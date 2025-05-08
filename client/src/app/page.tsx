@@ -8,15 +8,11 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import UserAvatar from "@/components/UserAvatar";
 
 function UserList({ users }: { users: User[] }) {
-  if (users.length === 0) {
-    return <div className="text-lg text-muted-foreground">No users found.</div>;
-  }
-
   return (
-    <div className="flex flex-wrap justify-center gap-8 max-w-3xl">
+    <div className="flex flex-wrap justify-center gap-8">
       {users.map((user) => (
-        <Link 
-          href={`/user/${user.id}`} 
+        <Link
+          href={`/user/${user.id}`}
           key={user.id}
           className="flex flex-col items-center group transition-transform hover:scale-105"
         >
@@ -24,10 +20,10 @@ function UserList({ users }: { users: User[] }) {
           <span className="mt-2 text-center group-hover:font-medium">{user.name}</span>
         </Link>
       ))}
-      
+
       {/* Add user button */}
-      <Link 
-        href="/user/new" 
+      <Link
+        href="/user/new"
         className="flex flex-col items-center group transition-transform hover:scale-105"
       >
         <Avatar className="bg-muted w-16 h-16 transition-shadow group-hover:shadow-lg group-hover:bg-muted/80">
@@ -56,7 +52,7 @@ function ErrorMessage({ message }: { message: string }) {
 
 export default async function Home() {
   const result = await usersService.getUsers();
-  
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-8">
       <Card className="w-full max-w-4xl">
@@ -65,7 +61,7 @@ export default async function Home() {
         </CardHeader>
         <CardContent>
           {!result.ok && <ErrorMessage message={result.error.message} />}
-          
+
           <Suspense fallback={<div className="text-xl text-center">Loading users...</div>}>
             {result.ok && <UserList users={result.value} />}
           </Suspense>
