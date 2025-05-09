@@ -8,10 +8,10 @@ import (
 )
 
 type PlantResponseDto struct {
-	Id            int64      `json:"id"`
-	Name          string     `json:"name"`
 	LastWaterTime *time.Time `json:"lastWaterTime"`
 	NextWaterDue  *time.Time `json:"nextWaterDue"`
+	Name          string     `json:"name"`
+	Id            int64      `json:"id"`
 }
 
 func FromStorePlants(plants []database.Plant) []*PlantResponseDto {
