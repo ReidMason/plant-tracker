@@ -1,7 +1,7 @@
 import BaseApi, { Result } from './api';
 
 export enum EventType {
-  Water
+  Water = 1
 }
 
 export interface Event {
