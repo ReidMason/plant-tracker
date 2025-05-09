@@ -66,7 +66,7 @@ func (p *plantsHandler) handleUserPlants(w http.ResponseWriter, r *http.Request)
 			apiResponse.InternalServerError[any](w, []string{"Failed to get plant"})
 			return
 		}
-		apiResponse.Ok(w, plantDtos.FromStorePlants(plants))
+		apiResponse.Ok(w, plantDtos.FromServicePlants(plants))
 	case "POST":
 		p.handleCreatePlant(w, r, userId)
 	default:

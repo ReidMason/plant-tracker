@@ -87,3 +87,24 @@ func (q *Queries) GetEventsByPlantId(ctx context.Context, plantid int64) ([]Even
 	}
 	return items, nil
 }
+
+const getLatestWaterEventByPlantId = `-- name: GetLatestWaterEventByPlantId :one
+SELECT id, plantid, eventtype, note, timestamp
+FROM events
+WHERE plantid = $1 AND eventtype = 1
+ORDER BY timestamp DESC
+LIMIT 1
+`
+
+func (q *Queries) GetLatestWaterEventByPlantId(ctx context.Context, plantid int64) (Event, error) {
+	row := q.db.QueryRow(ctx, getLatestWaterEventByPlantId, plantid)
+	var i Event
+	err := row.Scan(
+		&i.ID,
+		&i.Plantid,
+		&i.Eventtype,
+		&i.Note,
+		&i.Timestamp,
+	)
+	return i, err
+}

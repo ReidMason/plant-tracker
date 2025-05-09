@@ -1,13 +1,17 @@
 package plantDtos
 
 import (
+	"time"
+
+	"github.com/ReidMason/plant-tracker/src/services/plantsService"
 	"github.com/ReidMason/plant-tracker/src/stores/database"
 )
 
 type PlantResponseDto struct {
-	Id     int64  `json:"id"`
-	UserId int64  `json:"userId"`
-	Name   string `json:"name"`
+	Id            int64      `json:"id"`
+	Name          string     `json:"name"`
+	LastWaterTime *time.Time `json:"lastWaterTime"`
+	NextWaterDue  *time.Time `json:"nextWaterDue"`
 }
 
 func FromStorePlants(plants []database.Plant) []*PlantResponseDto {
@@ -19,10 +23,35 @@ func FromStorePlants(plants []database.Plant) []*PlantResponseDto {
 	return plantsDto
 }
 
+func FromServicePlants(plants []plantsService.Plant) []*PlantResponseDto {
+	plantsDto := make([]*PlantResponseDto, len(plants))
+	for i, plant := range plants {
+		plantsDto[i] = FromServicePlant(plant)
+	}
+
+	return plantsDto
+}
+
+func FromServicePlant(plant plantsService.Plant) *PlantResponseDto {
+	response := &PlantResponseDto{
+		Id:   plant.Id,
+		Name: plant.Name,
+	}
+
+	if plant.LatestWaterEvent != (database.Event{}) {
+		response.LastWaterTime = &plant.LatestWaterEvent.Timestamp
+	}
+
+	if plant.NextWaterDue != (time.Time{}) {
+		response.NextWaterDue = &plant.NextWaterDue
+	}
+
+	return response
+}
+
 func FromStorePlant(plant database.Plant) *PlantResponseDto {
 	return &PlantResponseDto{
-		Id:     plant.ID,
-		UserId: plant.Userid,
-		Name:   plant.Name,
+		Id:   plant.ID,
+		Name: plant.Name,
 	}
 }

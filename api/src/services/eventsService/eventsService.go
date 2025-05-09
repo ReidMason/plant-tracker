@@ -13,6 +13,7 @@ type EventsService interface {
 	GetEventsByPlantId(ctx context.Context, plantId int64) ([]database.Event, error)
 	CreateWateringEvent(ctx context.Context, plantId int64, note string) (database.Event, error)
 	GetEventById(ctx context.Context, id int64) (database.Event, error)
+	GetLatestWaterEventByPlantId(ctx context.Context, plantid int64) (database.Event, error)
 }
 
 type eventsService struct {
@@ -25,6 +26,10 @@ func New(eventsStore eventsStore.EventsStore, plantsStore plantsStore.PlantsStor
 		eventsStore: eventsStore,
 		plantsStore: plantsStore,
 	}
+}
+
+func (s *eventsService) GetLatestWaterEventByPlantId(ctx context.Context, plantId int64) (database.Event, error) {
+	return s.eventsStore.GetLatestWaterEventByPlantId(ctx, plantId)
 }
 
 func (s *eventsService) GetEventsByPlantId(ctx context.Context, plantId int64) ([]database.Event, error) {
