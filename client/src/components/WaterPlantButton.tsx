@@ -9,9 +9,10 @@ interface WaterPlantButtonProps {
   userId: number;
   plantId: number;
   onSuccess?: () => void;
+  disabled?: boolean;
 }
 
-export default function WaterPlantButton({ userId, plantId, onSuccess }: WaterPlantButtonProps) {
+export default function WaterPlantButton({ userId, plantId, onSuccess, disabled }: WaterPlantButtonProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleWaterPlant = async () => {
@@ -40,7 +41,7 @@ export default function WaterPlantButton({ userId, plantId, onSuccess }: WaterPl
       size="sm"
       className="text-blue-600 border-blue-200 hover:bg-blue-50 hover:text-blue-700"
       onClick={handleWaterPlant}
-      disabled={isSubmitting}
+      disabled={isSubmitting || disabled}
     >
       {isSubmitting ? (
         <>

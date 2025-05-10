@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { Plant } from "@/lib/services/plantsService/plantsService";
+import { useState, useEffect } from "react";
+import { Plant, getPlantsByUserId } from "@/lib/services/plantsService/plantsService";
 import { Card } from "@/components/ui/card";
 import WaterPlantButton from "./WaterPlantButton";
 import LastWateredDisplay from "./LastWateredDisplay";
@@ -11,11 +11,22 @@ interface PlantListWithWateringProps {
   userId: number;
 }
 
-export default function PlantListWithWatering({ plants, userId }: PlantListWithWateringProps) {
-  // Use a map to track refresh triggers for each plant
-  const [refreshTriggers, setRefreshTriggers] = useState<Record<number, number>>(
-    plants.reduce((acc, plant) => ({ ...acc, [plant.id]: 0 }), {})
-  );
+export default function PlantListWithWatering({ plants: initialPlants, userId }: PlantListWithWateringProps) {
+  const [plants, setPlants] = useState<Plant[]>(initialPlants);
+  const [loadingPlantId, setLoadingPlantId] = useState<number | null>(null);
+
+  useEffect(() => {
+    setPlants(initialPlants);
+  }, [initialPlants]);
+
+  const handleWateringSuccess = async (plantId: number) => {
+    setLoadingPlantId(plantId);
+    const result = await getPlantsByUserId(userId);
+    if (result.ok) {
+      setPlants(result.value);
+    }
+    setLoadingPlantId(null);
+  };
 
   if (plants.length === 0) {
     return (
@@ -24,14 +35,6 @@ export default function PlantListWithWatering({ plants, userId }: PlantListWithW
       </div>
     );
   }
-
-  const handleWateringSuccess = (plantId: number) => {
-    // Update refresh trigger for the specific plant
-    setRefreshTriggers(prev => ({
-      ...prev,
-      [plantId]: (prev[plantId] || 0) + 1
-    }));
-  };
 
   return (
     <div className="space-y-3">
@@ -53,7 +56,6 @@ export default function PlantListWithWatering({ plants, userId }: PlantListWithW
                     <LastWateredDisplay
                       lastWaterEvent={plant.lastWaterEvent}
                       nextWaterDue={plant.nextWaterDue}
-                      refreshTrigger={refreshTriggers[plant.id]}
                     />
                   </div>
                 </div>
@@ -62,6 +64,7 @@ export default function PlantListWithWatering({ plants, userId }: PlantListWithW
                 userId={userId}
                 plantId={plant.id}
                 onSuccess={() => handleWateringSuccess(plant.id)}
+                disabled={loadingPlantId === plant.id}
               />
             </div>
           </Card>
