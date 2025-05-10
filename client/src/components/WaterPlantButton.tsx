@@ -10,9 +10,10 @@ interface WaterPlantButtonProps {
   plantId: number;
   onSuccess?: () => void;
   disabled?: boolean;
+  needsWatering?: boolean;
 }
 
-export default function WaterPlantButton({ userId, plantId, onSuccess, disabled }: WaterPlantButtonProps) {
+export default function WaterPlantButton({ userId, plantId, onSuccess, disabled, needsWatering }: WaterPlantButtonProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleWaterPlant = async () => {
@@ -37,9 +38,11 @@ export default function WaterPlantButton({ userId, plantId, onSuccess, disabled 
 
   return (
     <Button
-      variant="outline"
+      variant={needsWatering ? "default" : "outline"}
       size="sm"
-      className="text-blue-600 border-blue-200 hover:bg-blue-50 hover:text-blue-700"
+      className={needsWatering
+        ? "bg-green-600 text-white border-green-700 hover:bg-green-700 hover:text-white"
+        : "text-blue-600 border-blue-200 hover:bg-blue-50 hover:text-blue-700"}
       onClick={handleWaterPlant}
       disabled={isSubmitting || disabled}
     >

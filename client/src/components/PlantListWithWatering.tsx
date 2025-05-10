@@ -65,6 +65,9 @@ export default function PlantListWithWatering({ plants: initialPlants, userId }:
                 plantId={plant.id}
                 onSuccess={() => handleWateringSuccess(plant.id)}
                 disabled={loadingPlantId === plant.id}
+                needsWatering={
+                  !plant.nextWaterDue || (plant.nextWaterDue instanceof Date && plant.nextWaterDue.getTime() < Date.now())
+                }
               />
             </div>
           </Card>
