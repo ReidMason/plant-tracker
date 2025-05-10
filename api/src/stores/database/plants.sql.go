@@ -60,3 +60,22 @@ func (q *Queries) GetPlantsByUserId(ctx context.Context, userid int64) ([]Plant,
 	}
 	return items, nil
 }
+
+const updatePlant = `-- name: UpdatePlant :one
+UPDATE plants
+SET name = $2
+WHERE id = $1
+RETURNING id, name, userid
+`
+
+type UpdatePlantParams struct {
+	ID   int64
+	Name string
+}
+
+func (q *Queries) UpdatePlant(ctx context.Context, arg UpdatePlantParams) (Plant, error) {
+	row := q.db.QueryRow(ctx, updatePlant, arg.ID, arg.Name)
+	var i Plant
+	err := row.Scan(&i.ID, &i.Name, &i.Userid)
+	return i, err
+}

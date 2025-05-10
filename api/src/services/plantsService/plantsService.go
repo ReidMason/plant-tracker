@@ -15,6 +15,7 @@ type GetPlantsService interface {
 	GetPlantsByUserId(ctx context.Context, userId int64) ([]Plant, error)
 	GetPlantById(ctx context.Context, id int64) (Plant, error)
 	CreatePlant(ctx context.Context, name string, userId int64) (database.Plant, error)
+	UpdatePlant(ctx context.Context, id int64, name string) (Plant, error)
 }
 
 type PlantsService struct {
@@ -94,4 +95,16 @@ func (p *PlantsService) CreatePlant(ctx context.Context, name string, userId int
 		Name:   name,
 		Userid: userId,
 	})
+}
+
+func (p *PlantsService) UpdatePlant(ctx context.Context, id int64, name string) (Plant, error) {
+	_, err := p.plantsStore.UpdatePlant(ctx, database.UpdatePlantParams{
+		ID:   id,
+		Name: name,
+	})
+	if err != nil {
+		return Plant{}, err
+	}
+	// Fetch the updated plant and its latest water event
+	return p.GetPlantById(ctx, id)
 }

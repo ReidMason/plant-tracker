@@ -105,7 +105,20 @@ func (p *plantsHandler) handleSingleUserPlant(w http.ResponseWriter, r *http.Req
 		}
 		apiResponse.Ok(w, plantDtos.FromServicePlant(plant))
 	case "PUT":
-		fmt.Fprintln(w, "PUT /users/{userId}/plants/{plantId}")
+		// Parse body for new name
+		var req struct {
+			Name string `json:"name"`
+		}
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil || req.Name == "" {
+			apiResponse.BadRequest[any](w, []string{"Invalid request body"})
+			return
+		}
+		updatedPlant, err := p.plantsService.UpdatePlant(ctx, int64(plantId), req.Name)
+		if err != nil {
+			apiResponse.InternalServerError[any](w, []string{"Failed to update plant"})
+			return
+		}
+		apiResponse.Ok(w, plantDtos.FromServicePlant(updatedPlant))
 	case "DELETE":
 		fmt.Fprintln(w, "DELETE /users/{userId}/plants/{plantId}")
 	default:
