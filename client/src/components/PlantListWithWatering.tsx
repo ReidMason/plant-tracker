@@ -40,38 +40,42 @@ export default function PlantListWithWatering({ plants: initialPlants, userId }:
     <div className="space-y-3">
       <h2 className="text-lg font-semibold mb-4">Plants</h2>
       <div className="grid grid-cols-1 gap-3">
-        {plants.map((plant) => (
-          <Card
-            key={plant.id}
-            className="p-3 hover:shadow-md transition-shadow"
-          >
-            <div className="flex items-center mb-2">
-              <div className="flex-grow">
-                <div className="flex items-center gap-2">
-                  <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-green-100 text-2xl mr-2">
-                    🌱
-                  </span>
-                  <div>
-                    <h3 className="font-medium">{plant.name}</h3>
-                    <LastWateredDisplay
-                      lastWaterEvent={plant.lastWaterEvent}
-                      nextWaterDue={plant.nextWaterDue}
-                    />
+        {plants.map((plant) => {
+          const isOverdue = !plant.nextWaterDue || (plant.nextWaterDue instanceof Date && plant.nextWaterDue.getTime() < Date.now());
+          return (
+            <Card
+              key={plant.id}
+              className={
+                `p-3 hover:shadow-md transition-shadow ` +
+                (isOverdue ? 'bg-orange-50 border border-orange-200 shadow-sm' : '')
+              }
+            >
+              <div className="flex items-center mb-2">
+                <div className="flex-grow">
+                  <div className="flex items-center gap-2">
+                    <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-green-100 text-2xl mr-2">
+                      🌱
+                    </span>
+                    <div>
+                      <h3 className="font-medium">{plant.name}</h3>
+                      <LastWateredDisplay
+                        lastWaterEvent={plant.lastWaterEvent}
+                        nextWaterDue={plant.nextWaterDue}
+                      />
+                    </div>
                   </div>
                 </div>
+                <WaterPlantButton
+                  userId={userId}
+                  plantId={plant.id}
+                  onSuccess={() => handleWateringSuccess(plant.id)}
+                  disabled={loadingPlantId === plant.id}
+                  needsWatering={isOverdue}
+                />
               </div>
-              <WaterPlantButton
-                userId={userId}
-                plantId={plant.id}
-                onSuccess={() => handleWateringSuccess(plant.id)}
-                disabled={loadingPlantId === plant.id}
-                needsWatering={
-                  !plant.nextWaterDue || (plant.nextWaterDue instanceof Date && plant.nextWaterDue.getTime() < Date.now())
-                }
-              />
-            </div>
-          </Card>
-        ))}
+            </Card>
+          );
+        })}
       </div>
     </div>
   );
