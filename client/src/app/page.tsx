@@ -7,6 +7,8 @@ import { AlertCircle, Plus } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import UserAvatar from "@/components/UserAvatar";
 
+export const dynamic = 'force-dynamic'
+
 function UserList({ users }: { users: User[] }) {
   return (
     <div className="flex flex-wrap justify-center gap-8">

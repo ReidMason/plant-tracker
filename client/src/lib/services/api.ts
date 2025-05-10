@@ -58,8 +58,6 @@ class BaseApi {
     const config: RequestInit = {
       method,
       headers,
-      cache: 'no-store',
-      next: { revalidate: 0 },
     };
 
     if (data) {
