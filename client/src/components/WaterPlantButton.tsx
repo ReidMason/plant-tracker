@@ -41,9 +41,12 @@ export default function WaterPlantButton({ userId, plantId, onSuccess, disabled,
     <Button
       variant={needsWatering ? "default" : "outline"}
       size="sm"
-      className={needsWatering
-        ? "bg-green-600 text-white border-green-700 hover:bg-green-700 hover:text-white"
-        : "text-blue-600 border-blue-200 hover:bg-blue-50 hover:text-blue-700"}
+      className={
+        (needsWatering
+          ? "bg-green-600 text-white border-green-700 hover:bg-green-700 hover:text-white "
+          : "text-blue-600 border-blue-200 hover:bg-blue-50 hover:text-blue-700 ") +
+        "cursor-pointer"
+      }
       onClick={e => {
         if (onClick) onClick(e);
         handleWaterPlant();
