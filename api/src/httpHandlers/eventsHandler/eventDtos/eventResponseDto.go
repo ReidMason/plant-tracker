@@ -14,8 +14,8 @@ type EventResponseDto struct {
 	TypeId    int32     `json:"typeId"`
 }
 
-func FromStoreEvents(events []database.Event) []EventResponseDto {
-	eventsDto := make([]EventResponseDto, len(events))
+func FromStoreEvents(events []database.Event) []*EventResponseDto {
+	eventsDto := make([]*EventResponseDto, len(events))
 	for i, event := range events {
 		eventsDto[i] = FromStoreEvent(event)
 	}
@@ -23,8 +23,8 @@ func FromStoreEvents(events []database.Event) []EventResponseDto {
 	return eventsDto
 }
 
-func FromStoreEvent(event database.Event) EventResponseDto {
-	return EventResponseDto{
+func FromStoreEvent(event database.Event) *EventResponseDto {
+	return &EventResponseDto{
 		Id:        event.ID,
 		PlantId:   event.Plantid,
 		TypeId:    event.Eventtype,

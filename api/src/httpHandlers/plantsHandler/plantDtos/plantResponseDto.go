@@ -3,15 +3,16 @@ package plantDtos
 import (
 	"time"
 
+	"github.com/ReidMason/plant-tracker/src/httpHandlers/eventsHandler/eventDtos"
 	"github.com/ReidMason/plant-tracker/src/services/plantsService"
 	"github.com/ReidMason/plant-tracker/src/stores/database"
 )
 
 type PlantResponseDto struct {
-	LastWaterTime *time.Time `json:"lastWaterTime"`
-	NextWaterDue  *time.Time `json:"nextWaterDue"`
-	Name          string     `json:"name"`
-	Id            int64      `json:"id"`
+	LastWaterEvent *eventDtos.EventResponseDto `json:"lastWaterEvent"`
+	NextWaterDue   *time.Time                  `json:"nextWaterDue"`
+	Name           string                      `json:"name"`
+	Id             int64                       `json:"id"`
 }
 
 func FromStorePlants(plants []database.Plant) []*PlantResponseDto {
@@ -39,7 +40,7 @@ func FromServicePlant(plant plantsService.Plant) *PlantResponseDto {
 	}
 
 	if plant.LatestWaterEvent != (database.Event{}) {
-		response.LastWaterTime = &plant.LatestWaterEvent.Timestamp
+		response.LastWaterEvent = eventDtos.FromStoreEvent(plant.LatestWaterEvent)
 	}
 
 	if plant.NextWaterDue != (time.Time{}) {
