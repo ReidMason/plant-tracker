@@ -36,11 +36,11 @@ class BaseApi {
     return this.request<T>(endpoint, 'POST', data);
   }
 
-  protected async put<T, D = unknown>(endpoint: string, data?: D): Promise<Result<T>> {
+  async put<T, D = unknown>(endpoint: string, data?: D): Promise<Result<T>> {
     return this.request<T>(endpoint, 'PUT', data);
   }
 
-  protected async delete<T>(endpoint: string): Promise<Result<T>> {
+  async delete<T>(endpoint: string): Promise<Result<T>> {
     return this.request<T>(endpoint, 'DELETE');
   }
 

@@ -66,3 +66,15 @@ export async function createPlant(userId: string | number, plantData: CreatePlan
     return createErrorResult('Invalid plant data from server');
   }
 }
+
+export async function updatePlantName(userId: string | number, plantId: string | number, name: string): Promise<Result<Plant>> {
+  const apiResult = await baseApi.put<unknown, { name: string }>(`/users/${userId}/plants/${plantId}`, { name });
+  if (!apiResult.ok) return apiResult;
+  try {
+    const plant = PlantSchema.parse(apiResult.value);
+    return createSuccessResult(plant);
+  } catch (e) {
+    console.error(e)
+    return createErrorResult('Invalid plant data from server');
+  }
+}

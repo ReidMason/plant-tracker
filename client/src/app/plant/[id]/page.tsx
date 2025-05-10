@@ -3,18 +3,19 @@ import { getPlantById, Plant } from "@/lib/services/plantsService/plantsService"
 import LastWateredDisplay from "@/components/LastWateredDisplay";
 import WaterPlantButton from "@/components/WaterPlantButton";
 import Link from "next/link";
+import RenamePlant from "@/components/RenamePlant";
 
 interface PlantPageProps {
-  params: { id: string };
-  searchParams?: { userId?: string };
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ userId: string }>;
 }
 
 export default async function PlantPage({ params, searchParams }: PlantPageProps) {
-  const userId = searchParams?.userId;
+  const { userId } = await searchParams;
   if (!userId) {
     return <div className="p-8 text-center">User ID is required to view this plant.</div>;
   }
-  const plantId = params.id;
+  const { id: plantId } = await params;
   const result = await getPlantById(userId, plantId);
   if (!result.ok) {
     notFound();
@@ -30,7 +31,11 @@ export default async function PlantPage({ params, searchParams }: PlantPageProps
           <span className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-green-100 text-5xl mb-2 shadow">
             🌱
           </span>
-          <h1 className="text-3xl font-extrabold text-green-900 mb-1 tracking-tight">{plant.name}</h1>
+          <RenamePlant
+            name={plant.name}
+            plantId={plant.id}
+            userId={userId}
+          />
         </div>
         <div className={
           `${needsWatering ? "bg-yellow-50 border border-yellow-200" : "bg-green-50 border border-green-100"} p-4 rounded-lg`
