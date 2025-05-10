@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"embed"
+	"fmt"
 	"net/http"
 	"os"
 
@@ -41,9 +42,10 @@ func corsMiddleware(next http.Handler) http.Handler {
 var embedMigrations embed.FS
 
 func main() {
-	err := godotenv.Load()
-	if err != nil {
-		panic("Error loading .env file")
+	if _, err := os.Stat(".env"); err == nil {
+		if err := godotenv.Load(); err != nil {
+			panic("Error loading .env file")
+		}
 	}
 
 	mux := http.NewServeMux()
@@ -64,6 +66,7 @@ func main() {
 	defer sqldb.Close()
 
 	if err := sqldb.PingContext(ctx); err != nil {
+		fmt.Println(err)
 		panic("Failed to connect to database")
 	}
 
@@ -71,16 +74,19 @@ func main() {
 	goose.SetBaseFS(embedMigrations)
 
 	if err := goose.SetDialect("postgres"); err != nil {
+		fmt.Println(err)
 		panic(err)
 	}
 
 	if err := goose.Up(sqldb, "migrations"); err != nil {
+		fmt.Println(err)
 		panic(err)
 	}
 
 	// Open pgxpool.Pool for sqlc/database
 	pool, err := pgxpool.New(ctx, connectionString)
 	if err != nil {
+		fmt.Println(err)
 		panic("Failed to connect to database (pgxpool)")
 	}
 	defer pool.Close()
