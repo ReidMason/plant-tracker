@@ -2,10 +2,10 @@
 FROM golang:latest AS builder
 WORKDIR /app
 COPY . .
-RUN go build -o ./server 
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o ./server 
 
 # Runtime stage
-FROM debian:bookworm-slim
+FROM scratch
 WORKDIR /app
 COPY --from=builder /app/server .
 CMD ["./server"] 
