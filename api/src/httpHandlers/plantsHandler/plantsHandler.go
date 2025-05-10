@@ -11,7 +11,6 @@ import (
 	apiResponse "github.com/ReidMason/plant-tracker/src/httpHandlers/models"
 	"github.com/ReidMason/plant-tracker/src/httpHandlers/plantsHandler/plantDtos"
 	"github.com/ReidMason/plant-tracker/src/services/plantsService"
-	"github.com/ReidMason/plant-tracker/src/stores/database"
 )
 
 type plantsHandler struct {
@@ -100,11 +99,11 @@ func (p *plantsHandler) handleSingleUserPlant(w http.ResponseWriter, r *http.Req
 			return
 		}
 
-		if plant == (database.Plant{}) {
+		if plant.Id == 0 {
 			apiResponse.NotFound(w)
 			return
 		}
-		apiResponse.Ok(w, plantDtos.FromStorePlant(plant))
+		apiResponse.Ok(w, plantDtos.FromServicePlant(plant))
 	case "PUT":
 		fmt.Fprintln(w, "PUT /users/{userId}/plants/{plantId}")
 	case "DELETE":

@@ -11,7 +11,7 @@ import (
 
 type GetPlantsService interface {
 	GetPlantsByUserId(ctx context.Context, userId int64) ([]Plant, error)
-	GetPlantById(ctx context.Context, id int64) (database.Plant, error)
+	GetPlantById(ctx context.Context, id int64) (Plant, error)
 	CreatePlant(ctx context.Context, name string, userId int64) (database.Plant, error)
 }
 
@@ -70,8 +70,18 @@ func calculateNextWaterTime(lastWaterTime time.Time) time.Time {
 	return lastWaterTime.AddDate(0, 0, 7)
 }
 
-func (p *PlantsService) GetPlantById(ctx context.Context, id int64) (database.Plant, error) {
-	return p.plantsStore.GetPlantById(ctx, id)
+func (p *PlantsService) GetPlantById(ctx context.Context, id int64) (Plant, error) {
+	plant, err := p.plantsStore.GetPlantById(ctx, id)
+	if err != nil {
+		return Plant{}, err
+	}
+	model := DatabasePlantToPlantModel(plant)
+	latestWaterEvent, err := p.eventsStore.GetLatestWaterEventByPlantId(ctx, model.Id)
+	if err == nil && latestWaterEvent != (database.Event{}) {
+		model.LatestWaterEvent = latestWaterEvent
+		model.NextWaterDue = calculateNextWaterTime(latestWaterEvent.Timestamp)
+	}
+	return model, nil
 }
 
 func (p *PlantsService) CreatePlant(ctx context.Context, name string, userId int64) (database.Plant, error) {
