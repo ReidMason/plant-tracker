@@ -1,6 +1,6 @@
 "use server";
 
-import { createBackendBaseApi, Result } from "@/lib/services/api";
+import { createBackendBaseApi, Result } from '../api';
 
 export interface User {
   id: number;

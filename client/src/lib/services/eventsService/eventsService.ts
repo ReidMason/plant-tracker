@@ -1,22 +1,7 @@
 "use server";
 
-import { createBackendBaseApi, Result } from "./api";
-
-export enum EventType {
-  Water = 1
-}
-
-export interface Event {
-  id: number;
-  plantId: number;
-  typeId: EventType;
-  note: string;
-  timestamp: string;
-}
-
-export interface CreateEventRequest {
-  note: string;
-}
+import { createBackendBaseApi, Result } from '../api';
+import { CreateEventRequest } from './types';
 
 const baseApi = createBackendBaseApi();
 

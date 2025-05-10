@@ -1,12 +1,12 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL
-
 export type Result<T, E = Error> =
   | { ok: true; value: T }
   | { ok: false; error: E };
 
-/**
- * Create a successful result
- */
+export function createBackendBaseApi(): BaseApi {
+  const API_BASE_URL = process.env.API_BASE_URL
+  return new BaseApi(API_BASE_URL as string)
+}
+
 export function createSuccessResult<T>(data: T): Result<T> {
   return {
     ok: true,
@@ -14,9 +14,6 @@ export function createSuccessResult<T>(data: T): Result<T> {
   };
 }
 
-/**
- * Create an error result
- */
 export function createErrorResult<T>(error: string): Result<T> {
   return {
     ok: false,
@@ -24,15 +21,18 @@ export function createErrorResult<T>(error: string): Result<T> {
   };
 }
 
-/**
- * Base API helper for making HTTP requests
- */
 class BaseApi {
-  protected async get<T>(endpoint: string): Promise<Result<T>> {
+  baseUrl: string = "";
+
+  constructor(baseUrl: string) {
+    this.baseUrl = baseUrl;
+  }
+
+  async get<T>(endpoint: string): Promise<Result<T>> {
     return this.request<T>(endpoint, 'GET');
   }
 
-  protected async post<T, D = unknown>(endpoint: string, data?: D): Promise<Result<T>> {
+  async post<T, D = unknown>(endpoint: string, data?: D): Promise<Result<T>> {
     return this.request<T>(endpoint, 'POST', data);
   }
 
@@ -49,7 +49,7 @@ class BaseApi {
     method: string,
     data?: unknown
   ): Promise<Result<T>> {
-    const url = `${API_BASE_URL}${endpoint}`;
+    const url = `${this.baseUrl}${endpoint}`;
 
     const headers: HeadersInit = {
       'Content-Type': 'application/json',

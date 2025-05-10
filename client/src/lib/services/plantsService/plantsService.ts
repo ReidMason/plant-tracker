@@ -1,7 +1,7 @@
 "use server";
 
+import { Result, createSuccessResult, createErrorResult, createBackendBaseApi } from '../api';
 import { z } from 'zod';
-import { createBackendBaseApi, createErrorResult, createSuccessResult, Result } from './api';
 
 const EventSchema = z.object({
   id: z.number(),

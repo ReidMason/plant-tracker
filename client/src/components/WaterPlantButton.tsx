@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Droplet, Loader2 } from "lucide-react";
-import eventsService from "@/lib/services/eventsService";
+import { createWateringEvent } from "@/lib/services/eventsService/eventsService";
 
 interface WaterPlantButtonProps {
   userId: number;
@@ -17,13 +17,13 @@ export default function WaterPlantButton({ userId, plantId, onSuccess }: WaterPl
   const handleWaterPlant = async () => {
     setIsSubmitting(true);
     try {
-      const result = await eventsService.createWateringEvent(userId, plantId, { note: "" });
-      
+      const result = await createWateringEvent(userId, plantId, { note: "" });
+
       if (!result.ok) {
         console.error("Failed to water plant:", result.error.message);
         return;
       }
-      
+
       if (onSuccess) {
         onSuccess();
       }
@@ -35,9 +35,9 @@ export default function WaterPlantButton({ userId, plantId, onSuccess }: WaterPl
   };
 
   return (
-    <Button 
-      variant="outline" 
-      size="sm" 
+    <Button
+      variant="outline"
+      size="sm"
       className="text-blue-600 border-blue-200 hover:bg-blue-50 hover:text-blue-700"
       onClick={handleWaterPlant}
       disabled={isSubmitting}

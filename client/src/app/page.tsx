@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import Link from "next/link";
-import usersService, { User } from "../lib/services/usersService";
+import { getUsers, User } from "../lib/services/usersService/usersService";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { AlertCircle, Plus } from "lucide-react";
@@ -23,7 +23,6 @@ function UserList({ users }: { users: User[] }) {
         </Link>
       ))}
 
-      {/* Add user button */}
       <Link
         href="/user/new"
         className="flex flex-col items-center group transition-transform hover:scale-105"
@@ -46,14 +45,14 @@ function ErrorMessage({ message }: { message: string }) {
       <AlertTitle>Error</AlertTitle>
       <AlertDescription>
         {message}
-        <p className="mt-2">Please check that the API server is running at http://localhost:8080</p>
+        <p className="mt-2">Please check that the API server is running</p>
       </AlertDescription>
     </Alert>
   );
 }
 
 export default async function Home() {
-  const result = await usersService.getUsers();
+  const result = await getUsers();
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-8">

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Plant } from "@/lib/services/plantsService";
+import { Plant } from "@/lib/services/plantsService/plantsService";
 import { Card } from "@/components/ui/card";
 import WaterPlantButton from "./WaterPlantButton";
 import LastWateredDisplay from "./LastWateredDisplay";

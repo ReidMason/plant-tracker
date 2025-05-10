@@ -1,13 +1,13 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import usersService from '../../../lib/services/usersService';
-import plantsService from '../../../lib/services/plantsService';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Home, Plus } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
 import UserAvatar from "@/components/UserAvatar";
 import PlantListWithWatering from '@/components/PlantListWithWatering';
+import { getUserById } from '@/lib/services/usersService/usersService';
+import { getPlantsByUserId } from '@/lib/services/plantsService/plantsService';
 
 function ErrorMessage({ message }: { message: string }) {
   return (
@@ -28,7 +28,7 @@ interface UserPageParams {
 
 export default async function UserPage({ params }: { params: Promise<UserPageParams> }) {
   const { id } = await params;
-  const userResult = await usersService.getUserById(id);
+  const userResult = await getUserById(id);
 
   // If there's no data or the request failed, show 404 page
   if (!userResult.ok) {
@@ -38,7 +38,7 @@ export default async function UserPage({ params }: { params: Promise<UserPagePar
   const user = userResult.value;
 
   // Fetch plants for this user
-  const plantsResult = await plantsService.getPlantsByUserId(user.id);
+  const plantsResult = await getPlantsByUserId(user.id);
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-8">

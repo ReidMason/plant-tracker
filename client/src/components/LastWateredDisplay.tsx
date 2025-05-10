@@ -1,7 +1,7 @@
 "use client";
 
 import { Droplet } from "lucide-react";
-import type { Event } from "@/lib/services/eventsService";
+import type { Event } from "@/lib/services/eventsService/types";
 
 interface LastWateredDisplayProps {
   lastWaterEvent: Event | null | undefined;

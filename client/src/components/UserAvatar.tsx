@@ -1,6 +1,6 @@
 "use client";
 
-import { User } from "@/lib/services/usersService";
+import { User } from "@/lib/services/usersService/usersService";
 
 interface UserAvatarProps {
   user: User;
@@ -13,7 +13,7 @@ export default function UserAvatar({ user, size = "md" }: UserAvatarProps) {
     md: "w-16 h-16",
     lg: "w-24 h-24",
   };
-  
+
   // Text size classes based on avatar size
   const textSizeClasses = {
     sm: "text-sm",
@@ -22,7 +22,7 @@ export default function UserAvatar({ user, size = "md" }: UserAvatarProps) {
   };
 
   return (
-    <div 
+    <div
       className={`${sizeClasses[size]} rounded-full transition-shadow hover:shadow-lg overflow-hidden flex items-center justify-center`}
       style={{ backgroundColor: user.colour }}
     >
