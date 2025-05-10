@@ -53,9 +53,10 @@ func main() {
 	// Database connection
 	ctx := context.Background()
 
-	connectionString := os.Getenv("CONNECTION_STRING")
+	dbConnectionString := "DB_CONNECTION_STRING"
+	connectionString := os.Getenv(dbConnectionString)
 	if connectionString == "" {
-		panic("CONNECTION_STRING environment variable not set")
+		panic(fmt.Sprintf("%s environment variable not set", dbConnectionString))
 	}
 
 	// Open *sql.DB for goose migrations

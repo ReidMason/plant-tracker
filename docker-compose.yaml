@@ -16,7 +16,7 @@ services:
   api:
     build: ./api
     environment:
-      - "CONNECTION_STRING=postgresql://admin:admin@db:5432/plantTracker?sslmode=disable"
+      - "DB_CONNECTION_STRING=postgresql://admin:admin@db:5432/plantTracker?sslmode=disable"
     depends_on:
       db:
         condition: service_healthy
