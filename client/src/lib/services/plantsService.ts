@@ -1,6 +1,5 @@
 import BaseApi, { Result, createSuccessResult, createErrorResult } from './api';
 import { z } from 'zod';
-import type { Event } from './eventsService';
 
 const EventSchema = z.object({
   id: z.number(),
@@ -57,6 +56,7 @@ class PlantsService extends BaseApi {
       const plant = PlantSchema.parse(apiResult.value);
       return createSuccessResult(plant);
     } catch (e) {
+      console.error(e)
       return createErrorResult('Invalid plant data from server');
     }
   }
@@ -72,6 +72,7 @@ class PlantsService extends BaseApi {
       const plant = PlantSchema.parse(apiResult.value);
       return createSuccessResult(plant);
     } catch (e) {
+      console.error(e)
       return createErrorResult('Invalid plant data from server');
     }
   }

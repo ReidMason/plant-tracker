@@ -22,20 +22,24 @@ function ErrorMessage({ message }: { message: string }) {
   );
 }
 
-export default async function UserPage({ params }: { params: { id: string } }) {
-  const {id} = await params;
+interface UserPageParams {
+  id: string
+}
+
+export default async function UserPage({ params }: { params: Promise<UserPageParams> }) {
+  const { id } = await params;
   const userResult = await usersService.getUserById(id);
-  
+
   // If there's no data or the request failed, show 404 page
   if (!userResult.ok) {
     notFound();
   }
-  
+
   const user = userResult.value;
-  
+
   // Fetch plants for this user
   const plantsResult = await plantsService.getPlantsByUserId(user.id);
-  
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-8">
       <Card className="max-w-md w-full">
@@ -49,21 +53,21 @@ export default async function UserPage({ params }: { params: { id: string } }) {
 
         <CardContent>
           {!plantsResult.ok && <ErrorMessage message={plantsResult.error.message} />}
-          
+
           {plantsResult.ok && (
             <PlantListWithWatering plants={plantsResult.value} userId={user.id} />
           )}
         </CardContent>
-        
+
         <div className="flex justify-between px-6 py-4 border-t">
-          <Link 
-            href="/" 
+          <Link
+            href="/"
             className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
           >
             <Home className="mr-2 h-4 w-4" />
             Back
           </Link>
-          <Link 
+          <Link
             href={`/plant/new?userId=${user.id}`}
             className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2"
           >

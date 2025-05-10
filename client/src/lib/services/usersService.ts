@@ -1,4 +1,4 @@
-import BaseApi, { Result, createSuccessResult, createErrorResult } from './api';
+import BaseApi, { Result } from './api';
 
 export interface User {
   id: number;

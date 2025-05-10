@@ -1,6 +1,5 @@
 import Link from 'next/link';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { HomeIcon } from "lucide-react";
 
 export default function NotFound() {
@@ -13,7 +12,7 @@ export default function NotFound() {
         <CardContent className="text-center space-y-4">
           <h2 className="text-2xl font-semibold">Page Not Found</h2>
           <p className="text-muted-foreground">
-            The page you are looking for might have been removed or doesn't exist.
+            The page you are looking for might have been removed or doesn&apos;t exist.
           </p>
         </CardContent>
         <CardFooter className="flex justify-center">

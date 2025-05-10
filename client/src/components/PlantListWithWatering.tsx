@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { Plant } from "@/lib/services/plantsService";
 import { Card } from "@/components/ui/card";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import WaterPlantButton from "./WaterPlantButton";
 import LastWateredDisplay from "./LastWateredDisplay";
 
