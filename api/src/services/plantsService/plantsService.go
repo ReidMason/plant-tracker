@@ -2,6 +2,8 @@ package plantsService
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"time"
 
 	"github.com/ReidMason/plant-tracker/src/services/eventsService"
@@ -73,6 +75,9 @@ func calculateNextWaterTime(lastWaterTime time.Time) time.Time {
 func (p *PlantsService) GetPlantById(ctx context.Context, id int64) (Plant, error) {
 	plant, err := p.plantsStore.GetPlantById(ctx, id)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return Plant{}, nil
+		}
 		return Plant{}, err
 	}
 	model := DatabasePlantToPlantModel(plant)
