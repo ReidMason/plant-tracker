@@ -1,11 +1,31 @@
 services:
+  db:
+    image: postgres:17
+    environment:
+      - "POSTGRES_USER=admin"
+      - "POSTGRES_PASSWORD=admin"
+      - "POSTGRES_DB=plantTracker"
+    volumes:
+      - "./data:/var/lib/postgresql/data"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
   api:
     build: ./api
-    ports:
-      - 3001:3000
+    environment:
+      - "CONNECTION_STRING=postgresql://admin:admin@db:5432/plantTracker?sslmode=disable"
+    depends_on:
+      db:
+        condition: service_healthy
   client:
     build: ./client
     ports:
       - 3000:3000
     environment:
-      - NEXT_PUBLIC_API_BASE_URL='http://localhost:3001'
+      - "API_BASE_URL=http://api:8080"
+    depends_on:
+      api:
+        condition: service_started
