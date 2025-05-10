@@ -62,7 +62,6 @@ export default function LastWateredDisplay({ lastWaterEvent, nextWaterDue }: Las
   // Format the timestamp
   const wateredDate = new Date(lastWaterEvent.timestamp);
   const formattedDate = formatRelativeDay(wateredDate);
-  const formattedTime = wateredDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
   let nextWaterDueDisplay = null;
   if (nextWaterDue instanceof Date && !isNaN(nextWaterDue.getTime())) {
@@ -82,7 +81,7 @@ export default function LastWateredDisplay({ lastWaterEvent, nextWaterDue }: Las
 
   return (
     <div className="flex flex-col text-xs text-gray-500">
-        Last watered: {formattedDate} at {formattedTime}
+      Last watered: {formattedDate}
       {nextWaterDueDisplay}
     </div>
   );
