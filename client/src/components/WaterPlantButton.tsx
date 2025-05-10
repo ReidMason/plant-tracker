@@ -12,9 +12,11 @@ interface WaterPlantButtonProps {
   disabled?: boolean;
   needsWatering?: boolean;
   onClick?: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
+  size?: "sm" | "lg";
+  className?: string;
 }
 
-export default function WaterPlantButton({ userId, plantId, onSuccess, disabled, needsWatering, onClick }: WaterPlantButtonProps) {
+export default function WaterPlantButton({ userId, plantId, onSuccess, disabled, needsWatering, onClick, size = "sm", className }: WaterPlantButtonProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleWaterPlant = async () => {
@@ -40,12 +42,12 @@ export default function WaterPlantButton({ userId, plantId, onSuccess, disabled,
   return (
     <Button
       variant={needsWatering ? "default" : "outline"}
-      size="sm"
+      size={size}
       className={
-        (needsWatering
+        ((needsWatering
           ? "bg-green-600 text-white border-green-700 hover:bg-green-700 hover:text-white "
           : "text-blue-600 border-blue-200 hover:bg-blue-50 hover:text-blue-700 ") +
-        "cursor-pointer"
+        "cursor-pointer ") + (className || "")
       }
       onClick={e => {
         if (onClick) onClick(e);
