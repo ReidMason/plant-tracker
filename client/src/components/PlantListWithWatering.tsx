@@ -52,8 +52,8 @@ export default function PlantListWithWatering({ plants, userId }: PlantListWithW
                   <div>
                     <h3 className="font-medium">{plant.name}</h3>
                     <LastWateredDisplay
-                      userId={userId}
-                      plantId={plant.id}
+                      lastWaterEvent={plant.lastWaterEvent}
+                      nextWaterDue={plant.nextWaterDue}
                       refreshTrigger={refreshTriggers[plant.id]}
                     />
                   </div>
