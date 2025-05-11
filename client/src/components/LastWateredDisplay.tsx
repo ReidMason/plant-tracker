@@ -45,7 +45,7 @@ function formatNextWaterDue(date: Date) {
   if (diffDays < 0) return 'Overdue!';
   if (diffDays === 0) return 'Today';
   if (diffDays === 1) return 'Tomorrow';
-  if (diffDays < 7) {
+  if (diffDays <= 7) {
     // e.g. 'Friday' (capitalize first letter)
     const weekday = date.toLocaleDateString(undefined, { weekday: 'long' });
     return weekday.charAt(0).toUpperCase() + weekday.slice(1);
