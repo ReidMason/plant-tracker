@@ -48,27 +48,25 @@ export default function PlantListWithWatering({ plants: initialPlants, userId }:
             <Card
               key={plant.id}
               className={
-                `p-3 hover:shadow-md transition-shadow cursor-pointer ` +
-                (isOverdue ? 'bg-orange-50 border border-orange-200 shadow-sm' : '')
+                `p-3 hover:shadow-md transition-shadow cursor-pointer gap-0` +
+                (isOverdue ? 'bg-orange-50 border border-orange-200 shadow-sm gap-0' : '')
               }
             >
-              <div className="flex items-center mb-2">
-                <Link href={plantLink} className="flex-grow block" tabIndex={-1} style={{ textDecoration: 'none', color: 'inherit' }}>
-                  <div className="flex items-center gap-2">
-                    <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-green-100 text-2xl mr-2">
-                      🌱
-                    </span>
-                    <div>
-                      <h3 className="font-medium">
-                        {plant.name}
-                      </h3>
-                      <LastWateredDisplay
-                        lastWaterEvent={plant.lastWaterEvent}
-                        nextWaterDue={plant.nextWaterDue}
-                      />
-                    </div>
-                  </div>
-                </Link>
+              <Link href={plantLink} tabIndex={-1} style={{ textDecoration: 'none', color: 'inherit' }}>
+                <div className="flex items-center gap-3 mb-2">
+                  <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-green-100 text-2xl">
+                    🌱
+                  </span>
+                  <h3 className="font-semibold text-lg flex-1 truncate">{plant.name}</h3>
+                </div>
+              </Link>
+              <div className="flex items-center pl-11 gap-4 justify-between">
+                <div className="flex-1">
+                  <LastWateredDisplay
+                    lastWaterEvent={plant.lastWaterEvent}
+                    nextWaterDue={plant.nextWaterDue}
+                  />
+                </div>
                 <WaterPlantButton
                   userId={userId}
                   plantId={plant.id}
