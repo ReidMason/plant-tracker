@@ -16,7 +16,7 @@ function ErrorMessage({ message }: { message: string }) {
       <AlertTitle>Error</AlertTitle>
       <AlertDescription>
         {message}
-        <p className="mt-2">Please check that the API server is running at http://localhost:8080</p>
+        <p className="mt-2">Please check that the API server is running</p>
       </AlertDescription>
     </Alert>
   );
