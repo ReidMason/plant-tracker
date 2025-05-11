@@ -68,20 +68,20 @@ export default function LastWateredDisplay({ lastWaterEvent, nextWaterDue }: Las
     const formattedNextWaterDate = formatNextWaterDue(nextWaterDue);
     nextWaterDueDisplay = (
       <div className="flex items-center mt-1">
-        Next water due: {formattedNextWaterDate}
+        Water due: {formattedNextWaterDate}
       </div>
     );
   } else {
     nextWaterDueDisplay = (
       <div className="flex items-center mt-1 text-gray-400">
-        Next water due: Unknown
+        Water due: Unknown
       </div>
     );
   }
 
   return (
     <div className="flex flex-col text-xs text-gray-500">
-      Last watered: {formattedDate}
+      Watered: {formattedDate}
       {nextWaterDueDisplay}
     </div>
   );
