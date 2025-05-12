@@ -64,7 +64,7 @@ export default function PlantListWithWatering({ plants: initialPlants, userId }:
 
   return (
     <div className="space-y-3">
-      <div className="flex justify-end mb-2">
+      <div className="flex justify-end mb-4">
         <Link
           href={`/plant/new?userId=${userId}`}
           className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2"
@@ -75,23 +75,26 @@ export default function PlantListWithWatering({ plants: initialPlants, userId }:
       </div>
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-semibold">Plants</h2>
-        <Select value={sortBy} onValueChange={v => setSortBy(v as typeof sortBy)}>
-          <SelectTrigger className="w-44" aria-label="Sort by">
-            <SelectValue
-              aria-label={
-                sortBy === 'name' ? 'Sort by Name' : sortBy === 'lastWatered' ? 'Sort by Last Watered' : 'Sort by Next Water Due'
-              }
-              className="max-w-[8rem] truncate block"
-            >
-              {sortBy === 'name' ? 'Sort by Name' : sortBy === 'lastWatered' ? 'Sort by Last Watered' : 'Sort by Next Water Due'}
-            </SelectValue>
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="name">Sort by Name</SelectItem>
-            <SelectItem value="lastWatered">Sort by Last Watered</SelectItem>
-            <SelectItem value="nextWaterDue">Sort by Next Water Due</SelectItem>
-          </SelectContent>
-        </Select>
+        <div className="flex items-center gap-2">
+          <p>Sort by:</p>
+          <Select value={sortBy} onValueChange={v => setSortBy(v as typeof sortBy)}>
+            <SelectTrigger className="w-44" aria-label="Sort by">
+              <SelectValue
+                aria-label={
+                  sortBy === 'name' ? 'Name' : sortBy === 'lastWatered' ? 'Last Watered' : 'Next Water Due'
+                }
+                className="max-w-[8rem] truncate block"
+              >
+                {sortBy === 'name' ? 'Name' : sortBy === 'lastWatered' ? 'Last Watered' : 'Next Water Due'}
+              </SelectValue>
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="name">Name</SelectItem>
+              <SelectItem value="lastWatered">Last Watered</SelectItem>
+              <SelectItem value="nextWaterDue">Next Water Due</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       <PlantGrid 
