@@ -74,7 +74,10 @@ export default function PlantListWithWatering({ plants: initialPlants, userId }:
         </Link>
       </div>
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold">Plants</h2>
+        <div className="flex items-center gap-2">
+          <h2 className="text-lg font-semibold">Plants</h2>
+          <span className="text-sm text-muted-foreground">({plants.length})</span>
+        </div>
         <div className="flex items-center gap-2">
           <p>Sort by:</p>
           <Select value={sortBy} onValueChange={v => setSortBy(v as typeof sortBy)}>
