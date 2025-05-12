@@ -1,8 +1,5 @@
-"use client";
-
 import { Plant } from "@/lib/services/plantsService/plantsService";
 import Link from "next/link";
-import { Card } from "@/components/ui/card";
 import LastWateredDisplay from "./LastWateredDisplay";
 import WaterPlantButton from "./WaterPlantButton";
 

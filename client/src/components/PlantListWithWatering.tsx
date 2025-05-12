@@ -2,9 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { Plant, getPlantsByUserId } from "@/lib/services/plantsService/plantsService";
-import { Card } from "@/components/ui/card";
-import WaterPlantButton from "./WaterPlantButton";
-import LastWateredDisplay from "./LastWateredDisplay";
 import Link from "next/link";
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
 import { Plus } from "lucide-react";
@@ -100,7 +97,7 @@ export default function PlantListWithWatering({ plants: initialPlants, userId }:
         </div>
       </div>
 
-      <PlantGrid 
+      <PlantGrid
         plants={sortedPlants}
         userId={userId}
         loadingPlantId={loadingPlantId}
