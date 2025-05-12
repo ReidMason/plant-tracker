@@ -13,7 +13,7 @@ export default function PlantGrid({ plants, userId, loadingPlantId, onWateringSu
   onWateringSuccess: (plantId: number) => void;
 }) {
   return (
-    <ul role="list" className="grid grid-cols-1 gap-3">
+    <ul role="list" className="grid grid-cols-1 sm:grid-cols-2 gap-3">
       {plants.map((plant) => {
         const isOverdue = !plant.nextWaterDue || (plant.nextWaterDue instanceof Date && plant.nextWaterDue.getTime() < Date.now());
         const plantLink = `/plant/${plant.id}?userId=${userId}`;

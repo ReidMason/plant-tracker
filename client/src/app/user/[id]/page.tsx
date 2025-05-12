@@ -42,7 +42,7 @@ export default async function UserPage({ params }: { params: Promise<UserPagePar
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-8">
-      <Card className="max-w-md w-full">
+      <Card className="max-w-3xl w-full">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
             <UserAvatar user={user} size="lg" />
