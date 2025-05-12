@@ -7,6 +7,7 @@ import WaterPlantButton from "./WaterPlantButton";
 import LastWateredDisplay from "./LastWateredDisplay";
 import Link from "next/link";
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
+import { Plus } from "lucide-react";
 
 interface PlantListWithWateringProps {
   plants: Plant[];
@@ -57,6 +58,15 @@ export default function PlantListWithWatering({ plants: initialPlants, userId }:
 
   return (
     <div className="space-y-3">
+      <div className="flex justify-end mb-2">
+        <Link
+          href={`/plant/new?userId=${userId}`}
+          className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2"
+        >
+          <Plus className="mr-2 h-4 w-4" />
+          Add Plant
+        </Link>
+      </div>
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-semibold">Plants</h2>
         <Select value={sortBy} onValueChange={v => setSortBy(v as typeof sortBy)}>
