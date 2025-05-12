@@ -67,13 +67,13 @@ export default function LastWateredDisplay({ lastWaterEvent, nextWaterDue }: Las
   if (nextWaterDue instanceof Date && !isNaN(nextWaterDue.getTime())) {
     const formattedNextWaterDate = formatNextWaterDue(nextWaterDue);
     nextWaterDueDisplay = (
-      <div className="flex items-center mt-1">
+      <div className="flex items-center">
         Water due: {formattedNextWaterDate}
       </div>
     );
   } else {
     nextWaterDueDisplay = (
-      <div className="flex items-center mt-1 text-gray-400">
+      <div className="flex items-center text-gray-400">
         Water due: Unknown
       </div>
     );
