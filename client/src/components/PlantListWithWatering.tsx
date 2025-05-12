@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import WaterPlantButton from "./WaterPlantButton";
 import LastWateredDisplay from "./LastWateredDisplay";
 import Link from "next/link";
+import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
 
 interface PlantListWithWateringProps {
   plants: Plant[];
@@ -15,6 +16,7 @@ interface PlantListWithWateringProps {
 export default function PlantListWithWatering({ plants: initialPlants, userId }: PlantListWithWateringProps) {
   const [plants, setPlants] = useState<Plant[]>(initialPlants);
   const [loadingPlantId, setLoadingPlantId] = useState<number | null>(null);
+  const [sortBy, setSortBy] = useState<'name' | 'lastWatered' | 'nextWaterDue'>('name');
 
   useEffect(() => {
     setPlants(initialPlants);
@@ -29,6 +31,22 @@ export default function PlantListWithWatering({ plants: initialPlants, userId }:
     setLoadingPlantId(null);
   };
 
+  // Sorting logic
+  const sortedPlants = [...plants].sort((a, b) => {
+    if (sortBy === 'name') {
+      return a.name.localeCompare(b.name);
+    } else if (sortBy === 'lastWatered') {
+      const aTime = a.lastWaterEvent?.timestamp ? new Date(a.lastWaterEvent.timestamp).getTime() : 0;
+      const bTime = b.lastWaterEvent?.timestamp ? new Date(b.lastWaterEvent.timestamp).getTime() : 0;
+      return bTime - aTime; // Most recently watered first
+    } else if (sortBy === 'nextWaterDue') {
+      const aTime = a.nextWaterDue instanceof Date ? a.nextWaterDue.getTime() : Infinity;
+      const bTime = b.nextWaterDue instanceof Date ? b.nextWaterDue.getTime() : Infinity;
+      return aTime - bTime; // Soonest due first
+    }
+    return 0;
+  });
+
   if (plants.length === 0) {
     return (
       <div className="text-center text-muted-foreground my-6">
@@ -39,9 +57,28 @@ export default function PlantListWithWatering({ plants: initialPlants, userId }:
 
   return (
     <div className="space-y-3">
-      <h2 className="text-lg font-semibold mb-4">Plants</h2>
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-lg font-semibold">Plants</h2>
+        <Select value={sortBy} onValueChange={v => setSortBy(v as typeof sortBy)}>
+          <SelectTrigger className="w-44" aria-label="Sort by">
+            <SelectValue
+              aria-label={
+                sortBy === 'name' ? 'Sort by Name' : sortBy === 'lastWatered' ? 'Sort by Last Watered' : 'Sort by Next Water Due'
+              }
+              className="max-w-[8rem] truncate block"
+            >
+              {sortBy === 'name' ? 'Sort by Name' : sortBy === 'lastWatered' ? 'Sort by Last Watered' : 'Sort by Next Water Due'}
+            </SelectValue>
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="name">Sort by Name</SelectItem>
+            <SelectItem value="lastWatered">Sort by Last Watered</SelectItem>
+            <SelectItem value="nextWaterDue">Sort by Next Water Due</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
       <div className="grid grid-cols-1 gap-3">
-        {plants.map((plant) => {
+        {sortedPlants.map((plant) => {
           const isOverdue = !plant.nextWaterDue || (plant.nextWaterDue instanceof Date && plant.nextWaterDue.getTime() < Date.now());
           const plantLink = `/plant/${plant.id}?userId=${userId}`;
           return (
