@@ -45,7 +45,7 @@ export default function WaterPlantButton({ userId, plantId, onSuccess, disabled,
       size={size}
       className={
         ((needsWatering
-          ? "bg-green-600 text-white hover:bg-green-700 "
+          ? "bg-cyan-600 text-white hover:bg-cyan-700 "
           : "text-blue-600 hover:text-blue-700 bg-transparent ") +
         "cursor-pointer w-full h-full border-none rounded-none") + (className || "")
       }
