@@ -15,7 +15,7 @@ export default function PlantGrid({ plants, userId, loadingPlantId, onWateringSu
         const isOverdue = !plant.nextWaterDue || (plant.nextWaterDue instanceof Date && plant.nextWaterDue.getTime() < Date.now());
         const plantLink = `/plant/${plant.id}?userId=${userId}`;
         return (
-          <li key={plant.id} className="col-span-1 divide-y divide-gray-200 rounded-lg bg-white shadow">
+          <li key={plant.id} className="flex flex-col justify-between rounded-lg bg-white shadow overflow-hidden">
             <div className="flex w-full items-center justify-between space-x-6 p-6">
               <div className="flex-1 truncate">
                 <div className="flex items-center space-x-3">
@@ -35,7 +35,7 @@ export default function PlantGrid({ plants, userId, loadingPlantId, onWateringSu
               </div>
               {/* Optionally, you can add a plant image here if available */}
             </div>
-            <div className="-mt-px flex divide-x divide-gray-200">
+            <div className="-mt-px flex divide-x divide-gray-200 border-t border-gray-200">
               <div className="flex w-0 flex-1">
                 <Link
                   href={plantLink}
