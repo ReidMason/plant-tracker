@@ -94,7 +94,7 @@ export default async function UserPage({ params }: { params: Promise<UserPagePar
               )}
             </CardContent>
 
-            <div className="border-t border-gray-200/50 px-6 py-6 bg-gray-50/50 backdrop-blur-sm dark:border-gray-700/50 dark:bg-gray-700/20">
+            <div className="border-t border-gray-200/50 px-6 pt-6 backdrop-blur-sm dark:border-gray-700/50">
               <div className="flex justify-between items-center">
                 <Link
                   href="/"
