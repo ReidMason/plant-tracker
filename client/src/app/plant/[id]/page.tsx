@@ -1,21 +1,88 @@
+"use client";
+
 import { notFound } from "next/navigation";
 import { getPlantById, Plant } from "@/lib/services/plantsService/plantsService";
 import LastWateredDisplay from "@/components/LastWateredDisplay";
 import WaterPlantButton from "@/components/WaterPlantButton";
+import WaterDropletAnimation from "@/components/WaterDropletAnimation";
 import Link from "next/link";
 import RenamePlant from "@/components/RenamePlant";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { ArrowLeft, Sprout, Sparkles, Droplets, Calendar, AlertTriangle } from "lucide-react";
+import { useState, useEffect } from "react";
 
 interface PlantPageProps {
   params: Promise<{ id: string }>;
   searchParams: Promise<{ userId: string }>;
 }
 
-export default async function PlantPage({ params, searchParams }: PlantPageProps) {
-  const { userId } = await searchParams;
-  if (!userId) {
+export default function PlantPage({ params, searchParams }: PlantPageProps) {
+  const [userId, setUserId] = useState<string>("");
+  const [plantId, setPlantId] = useState<string>("");
+  const [plant, setPlant] = useState<Plant | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [isAnimating, setIsAnimating] = useState(false);
+
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const resolvedParams = await params;
+        const resolvedSearchParams = await searchParams;
+        
+        setUserId(resolvedSearchParams.userId);
+        setPlantId(resolvedParams.id);
+
+        if (!resolvedSearchParams.userId) {
+          setError("User ID is required to view this plant.");
+          setLoading(false);
+          return;
+        }
+
+        const result = await getPlantById(resolvedSearchParams.userId, resolvedParams.id);
+        if (!result.ok) {
+          setError("Plant not found");
+          setLoading(false);
+          return;
+        }
+
+        setPlant(result.value);
+        setLoading(false);
+      } catch (err) {
+        setError("Failed to load plant data");
+        setLoading(false);
+      }
+    }
+
+    loadData();
+  }, [params, searchParams]);
+
+  const handleWateringClick = () => {
+    setIsAnimating(true);
+  };
+
+  const handleAnimationComplete = () => {
+    setIsAnimating(false);
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-green-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center p-8">
+        <Card className="bg-white/95 backdrop-blur-sm border border-gray-200/50 shadow-2xl dark:bg-gray-800/95 dark:border-gray-700/50 max-w-md">
+          <CardContent className="p-8 text-center">
+            <div className="w-16 h-16 bg-gradient-to-br from-emerald-500 to-green-600 rounded-full flex items-center justify-center mx-auto mb-4 animate-spin">
+              <Sprout className="w-8 h-8 text-white" />
+            </div>
+            <h2 className="text-xl font-semibold text-gray-900 mb-2 dark:text-gray-100">Loading Plant...</h2>
+            <p className="text-gray-600 dark:text-gray-400">Please wait while we fetch your plant data.</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (error || !userId) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-green-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center p-8">
         <Card className="bg-white/95 backdrop-blur-sm border border-gray-200/50 shadow-2xl dark:bg-gray-800/95 dark:border-gray-700/50 max-w-md">
@@ -23,20 +90,21 @@ export default async function PlantPage({ params, searchParams }: PlantPageProps
             <div className="w-16 h-16 bg-gradient-to-br from-red-500 to-pink-600 rounded-full flex items-center justify-center mx-auto mb-4">
               <AlertTriangle className="w-8 h-8 text-white" />
             </div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-2 dark:text-gray-100">Missing User ID</h2>
-            <p className="text-gray-600 dark:text-gray-400">User ID is required to view this plant.</p>
+            <h2 className="text-xl font-semibold text-gray-900 mb-2 dark:text-gray-100">
+              {error || "Missing User ID"}
+            </h2>
+            <p className="text-gray-600 dark:text-gray-400">
+              {error || "User ID is required to view this plant."}
+            </p>
           </CardContent>
         </Card>
       </div>
     );
   }
-  
-  const { id: plantId } = await params;
-  const result = await getPlantById(userId, plantId);
-  if (!result.ok) {
+
+  if (!plant) {
     notFound();
   }
-  const plant: Plant = result.value;
 
   const needsWatering = !plant.nextWaterDue || (plant.nextWaterDue instanceof Date && plant.nextWaterDue.getTime() < Date.now());
 
@@ -70,7 +138,15 @@ export default async function PlantPage({ params, searchParams }: PlantPageProps
           </div>
 
           {/* Main Plant Card */}
-          <Card className="bg-white/95 backdrop-blur-sm border border-gray-200/50 shadow-2xl dark:bg-gray-800/95 dark:border-gray-700/50">
+          <Card className="bg-white/95 backdrop-blur-sm border border-gray-200/50 shadow-2xl dark:bg-gray-800/95 dark:border-gray-700/50 relative">
+            {/* Water droplet animation overlay */}
+            {isAnimating && (
+              <WaterDropletAnimation
+                isAnimating={isAnimating}
+                onAnimationComplete={handleAnimationComplete}
+              />
+            )}
+
             <CardHeader className="text-center pb-3">
               {/* Back Button */}
               <div className="flex justify-start mb-6">
@@ -141,6 +217,7 @@ export default async function PlantPage({ params, searchParams }: PlantPageProps
                 <WaterPlantButton
                   userId={Number(userId)}
                   plantId={plant.id}
+                  onClick={handleWateringClick}
                   size="lg"
                   className={`w-full py-4 text-base font-semibold shadow-lg hover:shadow-xl transition-all duration-300 ${
                     needsWatering

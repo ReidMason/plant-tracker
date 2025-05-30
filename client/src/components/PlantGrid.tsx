@@ -2,7 +2,9 @@ import { Plant } from "@/lib/services/plantsService/plantsService";
 import Link from "next/link";
 import LastWateredDisplay from "./LastWateredDisplay";
 import WaterPlantButton from "./WaterPlantButton";
+import WaterDropletAnimation from "./WaterDropletAnimation";
 import { Droplets, Calendar, AlertTriangle, Sprout } from "lucide-react";
+import { useState } from "react";
 
 export default function PlantGrid({ plants, userId, loadingPlantId, onWateringSuccess }: {
   plants: Plant[];
@@ -10,15 +12,34 @@ export default function PlantGrid({ plants, userId, loadingPlantId, onWateringSu
   loadingPlantId: number | null;
   onWateringSuccess: (plantId: number) => void;
 }) {
+  const [animatingPlantId, setAnimatingPlantId] = useState<number | null>(null);
+
+  const handleWateringClick = (plantId: number) => {
+    setAnimatingPlantId(plantId);
+  };
+
+  const handleAnimationComplete = () => {
+    setAnimatingPlantId(null);
+  };
+
   return (
     <ul role="list" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
       {plants.map((plant) => {
         const isOverdue = !plant.nextWaterDue || (plant.nextWaterDue instanceof Date && plant.nextWaterDue.getTime() < Date.now());
         const plantLink = `/plant/${plant.id}?userId=${userId}`;
+        const isAnimating = animatingPlantId === plant.id;
         
         return (
           <li key={plant.id} className="group">
-            <div className="h-full bg-white/95 backdrop-blur-sm border border-gray-200/50 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col dark:bg-gray-800/95 dark:border-gray-700/50">
+            <div className="h-full bg-white/95 backdrop-blur-sm border border-gray-200/50 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col dark:bg-gray-800/95 dark:border-gray-700/50 relative">
+              {/* Water droplet animation overlay */}
+              {isAnimating && (
+                <WaterDropletAnimation
+                  isAnimating={isAnimating}
+                  onAnimationComplete={handleAnimationComplete}
+                />
+              )}
+
               {/* Header with plant icon and name */}
               <div className="relative p-6 pb-4">
                 {isOverdue && (
@@ -86,6 +107,7 @@ export default function PlantGrid({ plants, userId, loadingPlantId, onWateringSu
                     userId={userId}
                     plantId={plant.id}
                     onSuccess={() => onWateringSuccess(plant.id)}
+                    onClick={() => handleWateringClick(plant.id)}
                     disabled={loadingPlantId === plant.id}
                     needsWatering={isOverdue}
                     className={`w-full py-4 border-none rounded-none font-medium transition-all duration-200 text-sm ${
