@@ -4,7 +4,8 @@ import { useState, useEffect } from "react";
 import { Plant, getPlantsByUserId } from "@/lib/services/plantsService/plantsService";
 import Link from "next/link";
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
-import { Plus, Sprout, SortAsc } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Plus, Sprout, SortAsc, Search } from "lucide-react";
 import PlantGrid from "./PlantGrid";
 
 interface PlantListWithWateringProps {
@@ -16,6 +17,7 @@ export default function PlantListWithWatering({ plants: initialPlants, userId }:
   const [plants, setPlants] = useState<Plant[]>(initialPlants);
   const [loadingPlantId, setLoadingPlantId] = useState<number | null>(null);
   const [sortBy, setSortBy] = useState<'name' | 'lastWatered' | 'nextWaterDue'>('name');
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     setPlants(initialPlants);
@@ -30,8 +32,13 @@ export default function PlantListWithWatering({ plants: initialPlants, userId }:
     setLoadingPlantId(null);
   };
 
+  // Filter plants by search term first
+  const filteredPlants = plants.filter(plant =>
+    plant.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   // Sorting logic
-  const sortedPlants = [...plants].sort((a, b) => {
+  const sortedPlants = [...filteredPlants].sort((a, b) => {
     if (sortBy === 'name') {
       return a.name.localeCompare(b.name);
     } else if (sortBy === 'lastWatered') {
@@ -73,18 +80,33 @@ export default function PlantListWithWatering({ plants: initialPlants, userId }:
   return (
     <div className="space-y-6">
       {/* Header with controls */}
-      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between p-4 bg-gradient-to-r from-emerald-50 to-green-50 rounded-lg border border-emerald-200 dark:from-emerald-900/20 dark:to-green-900/20 dark:border-emerald-700/30">
+      <div className="flex flex-col gap-4 p-4 bg-gradient-to-r from-emerald-50 to-green-50 rounded-lg border border-emerald-200 dark:from-emerald-900/20 dark:to-green-900/20 dark:border-emerald-700/30">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-green-600 rounded-full flex items-center justify-center">
             <Sprout className="w-5 h-5 text-white" />
           </div>
           <div>
             <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Plant Collection</h2>
-            <p className="text-sm text-gray-600 dark:text-gray-400">{plants.length} plant{plants.length !== 1 ? 's' : ''} in your care</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              {filteredPlants.length} of {plants.length} plant{plants.length !== 1 ? 's' : ''} 
+              {searchTerm && ` matching "${searchTerm}"`}
+            </p>
           </div>
         </div>
         
-        <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+        <div className="flex flex-col sm:flex-row gap-3">
+          {/* Search Input */}
+          <div className="flex-1 relative flex items-center">
+            <Search className="absolute z-10 left-3 w-4 h-4 text-gray-400 dark:text-gray-500 pointer-events-none" />
+            <Input
+              placeholder="Search plants by name..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-10 bg-white/70 backdrop-blur-sm border-emerald-200 focus:border-emerald-400 focus:ring-emerald-400 dark:bg-gray-800/70 dark:border-emerald-700/50 dark:focus:border-emerald-500 dark:text-gray-200 dark:placeholder-gray-400"
+            />
+          </div>
+          
+          {/* Sort Controls */}
           <div className="flex items-center gap-2">
             <SortAsc className="w-4 h-4 text-gray-500 dark:text-gray-400" />
             <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Sort by:</span>
@@ -107,6 +129,7 @@ export default function PlantListWithWatering({ plants: initialPlants, userId }:
             </Select>
           </div>
 
+          {/* Add Plant Button */}
           <Link
             href={`/plant/new?userId=${userId}`}
             className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-emerald-600 to-green-600 text-white font-medium rounded-lg shadow-md hover:shadow-lg hover:from-emerald-700 hover:to-green-700 transition-all duration-300 transform hover:-translate-y-0.5"
@@ -117,12 +140,32 @@ export default function PlantListWithWatering({ plants: initialPlants, userId }:
         </div>
       </div>
 
-      <PlantGrid
-        plants={sortedPlants}
-        userId={userId}
-        loadingPlantId={loadingPlantId}
-        onWateringSuccess={handleWateringSuccess}
-      />
+      {/* Results or No Results Message */}
+      {filteredPlants.length === 0 && searchTerm ? (
+        <div className="text-center py-12">
+          <div className="w-16 h-16 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center mx-auto mb-4 dark:from-gray-700 dark:to-gray-600">
+            <Search className="w-6 h-6 text-gray-400 dark:text-gray-500" />
+          </div>
+          <h3 className="text-lg font-semibold text-gray-900 mb-2 dark:text-gray-100">No plants found</h3>
+          <p className="text-gray-500 dark:text-gray-400">
+            No plants match "{searchTerm}". Try a different search term.
+          </p>
+          <button
+            onClick={() => setSearchTerm('')}
+            className="mt-4 text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300 font-medium"
+          >
+            Clear search
+          </button>
+        </div>
+      ) : (
+        <PlantGrid
+          plants={sortedPlants}
+          userId={userId}
+          loadingPlantId={loadingPlantId}
+          onWateringSuccess={handleWateringSuccess}
+        />
+      )}
     </div>
   );
 } 
+
