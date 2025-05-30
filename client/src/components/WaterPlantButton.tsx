@@ -43,12 +43,14 @@ export default function WaterPlantButton({ userId, plantId, onSuccess, disabled,
     <Button
       variant={needsWatering ? "default" : "outline"}
       size={size}
-      className={
-        ((needsWatering
-          ? "bg-cyan-600 text-white hover:bg-cyan-700 "
-          : "text-blue-600 hover:text-blue-700 bg-transparent ") +
-        "cursor-pointer w-full h-full border-none rounded-none") + (className || "")
-      }
+      className={`
+        text-white font-semibold
+        border-none rounded-lg
+        cursor-pointer w-full h-full
+        transition-all duration-300
+        shadow-lg hover:shadow-xl
+        ${className || ""}
+      `}
       onClick={e => {
         if (onClick) onClick(e);
         handleWaterPlant();
@@ -63,9 +65,9 @@ export default function WaterPlantButton({ userId, plantId, onSuccess, disabled,
       ) : (
         <>
           <Droplet className="mr-2 h-4 w-4" />
-          Water
+          Water Plant
         </>
       )}
     </Button>
   );
-} 
+}
