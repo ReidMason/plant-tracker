@@ -59,7 +59,7 @@ export default function UserPage({ params }: { params: Promise<UserPageParams> }
         }
 
         setLoading(false);
-      } catch (err) {
+      } catch {
         setError("Failed to load user data");
         setLoading(false);
       }
@@ -79,7 +79,7 @@ export default function UserPage({ params }: { params: Promise<UserPageParams> }
               <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center animate-spin">
                 <Users className="w-10 h-10 text-white" />
               </div>
-              
+
               {/* Orbiting plants */}
               <div className="absolute inset-0 animate-spin" style={{ animationDirection: 'reverse', animationDuration: '3s' }}>
                 <div className="absolute -top-2 left-1/2 transform -translate-x-1/2">
@@ -104,10 +104,10 @@ export default function UserPage({ params }: { params: Promise<UserPageParams> }
                 </div>
               </div>
             </div>
-            
+
             <h2 className="text-xl font-semibold text-gray-900 mb-2 dark:text-gray-100">Loading Profile...</h2>
             <p className="text-gray-600 dark:text-gray-400">Fetching user data and plant collection</p>
-            
+
             {/* Loading dots */}
             <div className="flex justify-center gap-1 mt-4">
               <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce"></div>
@@ -147,12 +147,12 @@ export default function UserPage({ params }: { params: Promise<UserPageParams> }
         <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-blue-200/20 rounded-full blur-3xl dark:bg-blue-500/10"></div>
         <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-200/20 rounded-full blur-3xl dark:bg-purple-500/10"></div>
       </div>
-      
+
       {/* Theme toggle in top right */}
       <div className="absolute top-6 right-6 z-10">
         <ThemeToggle />
       </div>
-      
+
       <main className="relative flex min-h-screen flex-col items-center justify-center p-4 sm:p-8">
         <div className="w-full max-w-5xl">
           {/* Header Section */}
@@ -162,7 +162,7 @@ export default function UserPage({ params }: { params: Promise<UserPageParams> }
               <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Plant Tracker</span>
             </div>
             <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 bg-clip-text text-transparent mb-2 dark:from-blue-400 dark:via-purple-400 dark:to-blue-600 capitalize">
-              {user.name}'s Profile
+              {user.name}&apos;s Profile
             </h1>
             <p className="text-lg text-gray-600 dark:text-gray-400">
               Manage plants and track watering schedules
@@ -202,7 +202,7 @@ export default function UserPage({ params }: { params: Promise<UserPageParams> }
                   <Home className="w-4 h-4" />
                   Back to Dashboard
                 </Link>
-                
+
                 <div className="text-sm text-gray-500 dark:text-gray-400">
                   User ID: {user.id}
                 </div>

@@ -19,7 +19,6 @@ interface PlantPageProps {
 
 export default function PlantPage({ params, searchParams }: PlantPageProps) {
   const [userId, setUserId] = useState<string>("");
-  const [plantId, setPlantId] = useState<string>("");
   const [plant, setPlant] = useState<Plant | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -30,9 +29,8 @@ export default function PlantPage({ params, searchParams }: PlantPageProps) {
       try {
         const resolvedParams = await params;
         const resolvedSearchParams = await searchParams;
-        
+
         setUserId(resolvedSearchParams.userId);
-        setPlantId(resolvedParams.id);
 
         if (!resolvedSearchParams.userId) {
           setError("User ID is required to view this plant.");
@@ -49,7 +47,7 @@ export default function PlantPage({ params, searchParams }: PlantPageProps) {
 
         setPlant(result.value);
         setLoading(false);
-      } catch (err) {
+      } catch {
         setError("Failed to load plant data");
         setLoading(false);
       }
@@ -115,12 +113,12 @@ export default function PlantPage({ params, searchParams }: PlantPageProps) {
         <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-emerald-200/20 rounded-full blur-3xl dark:bg-emerald-500/10"></div>
         <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-green-200/20 rounded-full blur-3xl dark:bg-green-500/10"></div>
       </div>
-      
+
       {/* Theme toggle in top right */}
       <div className="absolute top-6 right-6 z-10">
         <ThemeToggle />
       </div>
-      
+
       <main className="relative flex min-h-screen flex-col items-center justify-center p-4 sm:p-8">
         <div className="w-full max-w-2xl">
           {/* Header Section */}
@@ -133,7 +131,7 @@ export default function PlantPage({ params, searchParams }: PlantPageProps) {
               Plant Details
             </h1>
             <p className="text-lg text-gray-600 dark:text-gray-400">
-              Manage your plant's care and watering schedule
+              Manage your plant&apos;s care and watering schedule
             </p>
           </div>
 
@@ -150,9 +148,9 @@ export default function PlantPage({ params, searchParams }: PlantPageProps) {
             <CardHeader className="text-center pb-3">
               {/* Back Button */}
               <div className="flex justify-start mb-6">
-                <Link 
-                  href={"/user/" + userId} 
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-white/70 backdrop-blur-sm border border-emerald-200 rounded-lg hover:bg-emerald-50 transition-all duration-200 dark:bg-gray-700/50 dark:border-emerald-700/50 dark:hover:bg-gray-700 dark:text-gray-200 text-emerald-700 dark:text-emerald-300"
+                <Link
+                  href={"/user/" + userId}
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-white/70 backdrop-blur-sm border border-emerald-200 rounded-lg hover:bg-emerald-50 transition-all duration-200 dark:bg-gray-700/50 dark:border-emerald-700/50 dark:hover:bg-gray-700 dark:text-gray-200 text-emerald-700"
                 >
                   <ArrowLeft className="w-4 h-4" />
                   Back to Profile
@@ -178,11 +176,10 @@ export default function PlantPage({ params, searchParams }: PlantPageProps) {
 
             <CardContent className="px-6 pb-8 pt-3 space-y-6">
               {/* Watering Status */}
-              <div className={`p-6 rounded-xl border ${
-                needsWatering 
-                  ? 'bg-gradient-to-r from-amber-50 to-orange-50 border-amber-200 dark:from-amber-900/20 dark:to-orange-900/20 dark:border-amber-700/30' 
-                  : 'bg-gradient-to-r from-emerald-50 to-green-50 border-emerald-200 dark:from-emerald-900/20 dark:to-green-900/20 dark:border-emerald-700/30'
-              }`}>
+              <div className={`p-6 rounded-xl border ${needsWatering
+                ? 'bg-gradient-to-r from-amber-50 to-orange-50 border-amber-200 dark:from-amber-900/20 dark:to-orange-900/20 dark:border-amber-700/30'
+                : 'bg-gradient-to-r from-emerald-50 to-green-50 border-emerald-200 dark:from-emerald-900/20 dark:to-green-900/20 dark:border-emerald-700/30'
+                }`}>
                 <div className="flex items-start gap-3">
                   {needsWatering ? (
                     <div className="w-12 h-12 bg-gradient-to-br from-amber-500 to-orange-600 rounded-full flex items-center justify-center flex-shrink-0">
@@ -193,19 +190,18 @@ export default function PlantPage({ params, searchParams }: PlantPageProps) {
                       <Calendar className="w-6 h-6 text-white" />
                     </div>
                   )}
-                  
+
                   <div className="flex-1">
-                    <h3 className={`font-semibold mb-2 ${
-                      needsWatering 
-                        ? 'text-amber-800 dark:text-amber-300' 
-                        : 'text-emerald-800 dark:text-emerald-300'
-                    }`}>
+                    <h3 className={`font-semibold mb-2 ${needsWatering
+                      ? 'text-amber-800 dark:text-amber-300'
+                      : 'text-emerald-800 dark:text-emerald-300'
+                      }`}>
                       {needsWatering ? 'Watering Needed' : 'Watering Status'}
                     </h3>
                     <div className="text-gray-700 dark:text-gray-300">
-                      <LastWateredDisplay 
-                        lastWaterEvent={plant.lastWaterEvent} 
-                        nextWaterDue={plant.nextWaterDue} 
+                      <LastWateredDisplay
+                        lastWaterEvent={plant.lastWaterEvent}
+                        nextWaterDue={plant.nextWaterDue}
                       />
                     </div>
                   </div>
@@ -219,11 +215,10 @@ export default function PlantPage({ params, searchParams }: PlantPageProps) {
                   plantId={plant.id}
                   onClick={handleWateringClick}
                   size="lg"
-                  className={`w-full py-4 text-base font-semibold shadow-lg hover:shadow-xl transition-all duration-300 ${
-                    needsWatering
-                      ? 'bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700'
-                      : 'bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700'
-                  }`}
+                  className={`w-full py-4 text-base font-semibold shadow-lg hover:shadow-xl transition-all duration-300 ${needsWatering
+                    ? 'bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700'
+                    : 'bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700'
+                    }`}
                   needsWatering={needsWatering}
                 />
               </div>

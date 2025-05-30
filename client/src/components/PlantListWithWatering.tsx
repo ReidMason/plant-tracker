@@ -88,12 +88,12 @@ export default function PlantListWithWatering({ plants: initialPlants, userId }:
           <div>
             <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Plant Collection</h2>
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              {filteredPlants.length} of {plants.length} plant{plants.length !== 1 ? 's' : ''} 
+              {filteredPlants.length} of {plants.length} plant{plants.length !== 1 ? 's' : ''}
               {searchTerm && ` matching "${searchTerm}"`}
             </p>
           </div>
         </div>
-        
+
         <div className="flex flex-col sm:flex-row gap-3">
           {/* Search Input */}
           <div className="flex-1 relative flex items-center">
@@ -105,7 +105,7 @@ export default function PlantListWithWatering({ plants: initialPlants, userId }:
               className="w-full pl-10 bg-white/70 backdrop-blur-sm border-emerald-200 focus:border-emerald-400 focus:ring-emerald-400 dark:bg-gray-800/70 dark:border-emerald-700/50 dark:focus:border-emerald-500 dark:text-gray-200 dark:placeholder-gray-400"
             />
           </div>
-          
+
           {/* Sort Controls */}
           <div className="flex items-center gap-2">
             <SortAsc className="w-4 h-4 text-gray-500 dark:text-gray-400" />
@@ -148,7 +148,7 @@ export default function PlantListWithWatering({ plants: initialPlants, userId }:
           </div>
           <h3 className="text-lg font-semibold text-gray-900 mb-2 dark:text-gray-100">No plants found</h3>
           <p className="text-gray-500 dark:text-gray-400">
-            No plants match "{searchTerm}". Try a different search term.
+            No plants match &quot;{searchTerm}&quot;. Try a different search term.
           </p>
           <button
             onClick={() => setSearchTerm('')}
@@ -167,5 +167,5 @@ export default function PlantListWithWatering({ plants: initialPlants, userId }:
       )}
     </div>
   );
-} 
+}
 
