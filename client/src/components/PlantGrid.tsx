@@ -2,7 +2,7 @@ import { Plant } from "@/lib/services/plantsService/plantsService";
 import Link from "next/link";
 import LastWateredDisplay from "./LastWateredDisplay";
 import WaterPlantButton from "./WaterPlantButton";
-import { Droplets, Calendar, AlertTriangle } from "lucide-react";
+import { Droplets, Calendar, AlertTriangle, Sprout } from "lucide-react";
 
 export default function PlantGrid({ plants, userId, loadingPlantId, onWateringSuccess }: {
   plants: Plant[];
@@ -32,8 +32,8 @@ export default function PlantGrid({ plants, userId, loadingPlantId, onWateringSu
                 
                 <div className="flex items-start gap-4">
                   <div className="relative">
-                    <div className="w-12 h-12 bg-gradient-to-br from-green-400 to-emerald-600 rounded-full flex items-center justify-center text-2xl shadow-lg">
-                      🌱
+                    <div className="w-12 h-12 bg-gradient-to-br from-green-400 to-emerald-600 rounded-full flex items-center justify-center shadow-lg">
+                      <Sprout className="w-6 h-6 text-white" />
                     </div>
                     <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-green-500/20 to-emerald-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                   </div>
