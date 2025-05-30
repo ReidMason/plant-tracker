@@ -1,14 +1,17 @@
+"use client";
+
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Home, User, Sparkles } from "lucide-react";
+import { Home, User, Sparkles, Sprout, Users } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
 import UserAvatar from "@/components/UserAvatar";
 import PlantListWithWatering from '@/components/PlantListWithWatering';
-import { getUserById } from '@/lib/services/usersService/usersService';
-import { getPlantsByUserId } from '@/lib/services/plantsService/plantsService';
+import { getUserById, User as UserType } from '@/lib/services/usersService/usersService';
+import { getPlantsByUserId, Plant } from '@/lib/services/plantsService/plantsService';
 import { ThemeToggle } from '@/components/theme-toggle';
+import { useState, useEffect } from 'react';
 
 function ErrorMessage({ message }: { message: string }) {
   return (
@@ -27,19 +30,115 @@ interface UserPageParams {
   id: string
 }
 
-export default async function UserPage({ params }: { params: Promise<UserPageParams> }) {
-  const { id } = await params;
-  const userResult = await getUserById(id);
+export default function UserPage({ params }: { params: Promise<UserPageParams> }) {
+  const [user, setUser] = useState<UserType | null>(null);
+  const [plants, setPlants] = useState<Plant[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // If there's no data or the request failed, show 404 page
-  if (!userResult.ok) {
-    notFound();
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const { id } = await params;
+        const userResult = await getUserById(id);
+
+        if (!userResult.ok) {
+          setError("User not found");
+          setLoading(false);
+          return;
+        }
+
+        setUser(userResult.value);
+
+        // Fetch plants for this user
+        const plantsResult = await getPlantsByUserId(userResult.value.id);
+        if (plantsResult.ok) {
+          setPlants(plantsResult.value);
+        } else {
+          setError(plantsResult.error.message);
+        }
+
+        setLoading(false);
+      } catch (err) {
+        setError("Failed to load user data");
+        setLoading(false);
+      }
+    }
+
+    loadData();
+  }, [params]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center p-8">
+        <Card className="bg-white/95 backdrop-blur-sm border border-gray-200/50 shadow-2xl dark:bg-gray-800/95 dark:border-gray-700/50 max-w-md">
+          <CardContent className="p-8 text-center">
+            {/* Animated user icon with plants */}
+            <div className="relative w-20 h-20 mx-auto mb-6">
+              {/* Main user circle */}
+              <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center animate-spin">
+                <Users className="w-10 h-10 text-white" />
+              </div>
+              
+              {/* Orbiting plants */}
+              <div className="absolute inset-0 animate-spin" style={{ animationDirection: 'reverse', animationDuration: '3s' }}>
+                <div className="absolute -top-2 left-1/2 transform -translate-x-1/2">
+                  <div className="w-6 h-6 bg-gradient-to-br from-emerald-400 to-green-500 rounded-full flex items-center justify-center shadow-md">
+                    <Sprout className="w-3 h-3 text-white" />
+                  </div>
+                </div>
+                <div className="absolute top-1/2 -right-2 transform -translate-y-1/2">
+                  <div className="w-5 h-5 bg-gradient-to-br from-emerald-500 to-green-600 rounded-full flex items-center justify-center shadow-md">
+                    <Sprout className="w-2.5 h-2.5 text-white" />
+                  </div>
+                </div>
+                <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2">
+                  <div className="w-4 h-4 bg-gradient-to-br from-emerald-400 to-green-500 rounded-full flex items-center justify-center shadow-md">
+                    <Sprout className="w-2 h-2 text-white" />
+                  </div>
+                </div>
+                <div className="absolute top-1/2 -left-2 transform -translate-y-1/2">
+                  <div className="w-5 h-5 bg-gradient-to-br from-emerald-500 to-green-600 rounded-full flex items-center justify-center shadow-md">
+                    <Sprout className="w-2.5 h-2.5 text-white" />
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <h2 className="text-xl font-semibold text-gray-900 mb-2 dark:text-gray-100">Loading Profile...</h2>
+            <p className="text-gray-600 dark:text-gray-400">Fetching user data and plant collection</p>
+            
+            {/* Loading dots */}
+            <div className="flex justify-center gap-1 mt-4">
+              <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce"></div>
+              <div className="w-2 h-2 bg-purple-500 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+              <div className="w-2 h-2 bg-emerald-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
   }
 
-  const user = userResult.value;
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center p-8">
+        <Card className="bg-white/95 backdrop-blur-sm border border-gray-200/50 shadow-2xl dark:bg-gray-800/95 dark:border-gray-700/50 max-w-md">
+          <CardContent className="p-8 text-center">
+            <div className="w-16 h-16 bg-gradient-to-br from-red-500 to-pink-600 rounded-full flex items-center justify-center mx-auto mb-4">
+              <AlertCircle className="w-8 h-8 text-white" />
+            </div>
+            <h2 className="text-xl font-semibold text-gray-900 mb-2 dark:text-gray-100">Error Loading Profile</h2>
+            <p className="text-gray-600 dark:text-gray-400">{error}</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
-  // Fetch plants for this user
-  const plantsResult = await getPlantsByUserId(user.id);
+  if (!user) {
+    notFound();
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
@@ -87,10 +186,10 @@ export default async function UserPage({ params }: { params: Promise<UserPagePar
             </CardHeader>
 
             <CardContent className="px-6 pb-8">
-              {!plantsResult.ok && <ErrorMessage message={plantsResult.error.message} />}
+              {error && <ErrorMessage message={error} />}
 
-              {plantsResult.ok && (
-                <PlantListWithWatering plants={plantsResult.value} userId={user.id} />
+              {plants && (
+                <PlantListWithWatering plants={plants} userId={user.id} />
               )}
             </CardContent>
 
