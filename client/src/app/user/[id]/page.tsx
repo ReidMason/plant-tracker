@@ -161,7 +161,7 @@ export default function UserPage({ params }: { params: Promise<UserPageParams> }
               <Sparkles className="w-5 h-5 text-blue-600 dark:text-blue-400" />
               <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Plant Tracker</span>
             </div>
-            <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 bg-clip-text text-transparent mb-2 dark:from-blue-400 dark:via-purple-400 dark:to-blue-600">
+            <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 bg-clip-text text-transparent mb-2 dark:from-blue-400 dark:via-purple-400 dark:to-blue-600 capitalize">
               {user.name}'s Profile
             </h1>
             <p className="text-lg text-gray-600 dark:text-gray-400">
@@ -180,7 +180,7 @@ export default function UserPage({ params }: { params: Promise<UserPageParams> }
               </div>
               <div className="flex items-center justify-center gap-2 mb-2">
                 <User className="w-6 h-6 text-blue-600 dark:text-blue-400" />
-                <CardTitle className="text-2xl font-semibold text-gray-800 dark:text-gray-200">{user.name}</CardTitle>
+                <CardTitle className="text-2xl font-semibold text-gray-800 dark:text-gray-200 capitalize">{user.name}</CardTitle>
               </div>
               <CardDescription className="text-gray-600 dark:text-gray-400">Plant Collection Manager</CardDescription>
             </CardHeader>
