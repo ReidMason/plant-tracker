@@ -18,7 +18,7 @@ export default function PlantGrid({ plants, userId, loadingPlantId, onWateringSu
         
         return (
           <li key={plant.id} className="group">
-            <div className="h-full bg-white/95 backdrop-blur-sm border border-gray-200/50 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col">
+            <div className="h-full bg-white/95 backdrop-blur-sm border border-gray-200/50 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col dark:bg-gray-800/95 dark:border-gray-700/50">
               {/* Header with plant icon and name */}
               <div className="relative p-6 pb-4">
                 {isOverdue && (
@@ -39,12 +39,12 @@ export default function PlantGrid({ plants, userId, loadingPlantId, onWateringSu
                   </div>
                   
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-gray-900 group-hover:text-emerald-600 transition-colors duration-200 truncate">
+                    <h3 className="font-semibold text-gray-900 group-hover:text-emerald-600 transition-colors duration-200 truncate dark:text-gray-100 dark:group-hover:text-emerald-400">
                       <Link href={plantLink} className="hover:underline">
                         {plant.name}
                       </Link>
                     </h3>
-                    <p className="text-sm text-gray-500 mt-1">Plant Collection</p>
+                    <p className="text-sm text-gray-500 mt-1 dark:text-gray-400">Plant Collection</p>
                   </div>
                 </div>
               </div>
@@ -53,14 +53,14 @@ export default function PlantGrid({ plants, userId, loadingPlantId, onWateringSu
               <div className="px-6 pb-4 flex-1">
                 <div className={`p-4 rounded-lg border ${
                   isOverdue 
-                    ? 'bg-gradient-to-r from-amber-50 to-orange-50 border-amber-200' 
-                    : 'bg-gradient-to-r from-emerald-50 to-green-50 border-emerald-200'
+                    ? 'bg-gradient-to-r from-amber-50 to-orange-50 border-amber-200 dark:from-amber-900/20 dark:to-orange-900/20 dark:border-amber-700/30' 
+                    : 'bg-gradient-to-r from-emerald-50 to-green-50 border-emerald-200 dark:from-emerald-900/20 dark:to-green-900/20 dark:border-emerald-700/30'
                 }`}>
                   <div className="flex items-start gap-2">
                     {isOverdue ? (
-                      <Droplets className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
+                      <Droplets className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0 dark:text-amber-400" />
                     ) : (
-                      <Calendar className="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0" />
+                      <Calendar className="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0 dark:text-emerald-400" />
                     )}
                     <div className="min-w-0 flex-1">
                       <LastWateredDisplay 
@@ -73,11 +73,11 @@ export default function PlantGrid({ plants, userId, loadingPlantId, onWateringSu
               </div>
 
               {/* Action buttons */}
-              <div className="border-t border-gray-200/50 bg-gray-50/50 backdrop-blur-sm mt-auto">
-                <div className="grid grid-cols-2 divide-x divide-gray-200/50">
+              <div className="border-t border-gray-200/50 bg-gray-50/50 backdrop-blur-sm mt-auto dark:border-gray-700/50 dark:bg-gray-700/20">
+                <div className="grid grid-cols-2 divide-x divide-gray-200/50 dark:divide-gray-700/50">
                   <Link
                     href={plantLink}
-                    className="flex items-center justify-center gap-2 py-4 text-sm font-medium text-gray-700 hover:text-emerald-600 hover:bg-emerald-50/50 transition-all duration-200"
+                    className="flex items-center justify-center gap-2 py-4 text-sm font-medium text-gray-700 hover:text-emerald-600 hover:bg-emerald-50/50 transition-all duration-200 dark:text-gray-300 dark:hover:text-emerald-400 dark:hover:bg-emerald-900/20"
                   >
                     <span>View Details</span>
                   </Link>
@@ -91,7 +91,7 @@ export default function PlantGrid({ plants, userId, loadingPlantId, onWateringSu
                     className={`w-full py-4 border-none rounded-none font-medium transition-all duration-200 text-sm ${
                       isOverdue
                         ? 'bg-gradient-to-r from-cyan-600 to-blue-600 text-white hover:from-cyan-700 hover:to-blue-700 shadow-md'
-                        : 'bg-transparent text-cyan-600 hover:text-cyan-700 hover:bg-cyan-50/50'
+                        : 'bg-transparent text-cyan-600 hover:text-cyan-700 hover:bg-cyan-50/50 dark:text-cyan-400 dark:hover:text-cyan-300 dark:hover:bg-cyan-900/20'
                     }`}
                   />
                 </div>

@@ -56,7 +56,7 @@ function formatNextWaterDue(date: Date) {
 
 export default function LastWateredDisplay({ lastWaterEvent, nextWaterDue }: LastWateredDisplayProps) {
   if (!lastWaterEvent || !lastWaterEvent.timestamp) {
-    return <span className="text-xs text-gray-400">Never watered</span>;
+    return <span className="text-xs text-gray-400 dark:text-gray-500">Never watered</span>;
   }
 
   // Format the timestamp
@@ -73,14 +73,14 @@ export default function LastWateredDisplay({ lastWaterEvent, nextWaterDue }: Las
     );
   } else {
     nextWaterDueDisplay = (
-      <div className="flex items-center text-gray-400">
+      <div className="flex items-center text-gray-400 dark:text-gray-500">
         Water due: Unknown
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col text-xs text-gray-500">
+    <div className="flex flex-col text-xs text-gray-500 dark:text-gray-400">
       Watered: {formattedDate}
       {nextWaterDueDisplay}
     </div>

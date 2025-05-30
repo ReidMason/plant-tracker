@@ -54,11 +54,11 @@ export default function PlantListWithWatering({ plants: initialPlants, userId }:
   if (plants.length === 0) {
     return (
       <div className="text-center py-12">
-        <div className="w-20 h-20 bg-gradient-to-br from-emerald-100 to-green-200 rounded-full flex items-center justify-center mx-auto mb-4">
-          <Sprout className="w-8 h-8 text-emerald-600" />
+        <div className="w-20 h-20 bg-gradient-to-br from-emerald-100 to-green-200 rounded-full flex items-center justify-center mx-auto mb-4 dark:from-emerald-800 dark:to-green-700">
+          <Sprout className="w-8 h-8 text-emerald-600 dark:text-emerald-300" />
         </div>
-        <h3 className="text-lg font-semibold text-gray-900 mb-2">No plants yet</h3>
-        <p className="text-gray-500 mb-6">Start building your plant collection</p>
+        <h3 className="text-lg font-semibold text-gray-900 mb-2 dark:text-gray-100">No plants yet</h3>
+        <p className="text-gray-500 mb-6 dark:text-gray-400">Start building your plant collection</p>
         <Link
           href={`/plant/new?userId=${userId}`}
           className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-emerald-600 to-green-600 text-white font-medium rounded-lg shadow-lg hover:shadow-xl hover:from-emerald-700 hover:to-green-700 transition-all duration-300 transform hover:-translate-y-0.5"
@@ -73,23 +73,23 @@ export default function PlantListWithWatering({ plants: initialPlants, userId }:
   return (
     <div className="space-y-6">
       {/* Header with controls */}
-      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between p-4 bg-gradient-to-r from-emerald-50 to-green-50 rounded-lg border border-emerald-200">
+      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between p-4 bg-gradient-to-r from-emerald-50 to-green-50 rounded-lg border border-emerald-200 dark:from-emerald-900/20 dark:to-green-900/20 dark:border-emerald-700/30">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-green-600 rounded-full flex items-center justify-center">
             <Sprout className="w-5 h-5 text-white" />
           </div>
           <div>
-            <h2 className="text-xl font-semibold text-gray-900">Plant Collection</h2>
-            <p className="text-sm text-gray-600">{plants.length} plant{plants.length !== 1 ? 's' : ''} in your care</p>
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Plant Collection</h2>
+            <p className="text-sm text-gray-600 dark:text-gray-400">{plants.length} plant{plants.length !== 1 ? 's' : ''} in your care</p>
           </div>
         </div>
         
         <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
           <div className="flex items-center gap-2">
-            <SortAsc className="w-4 h-4 text-gray-500" />
-            <span className="text-sm font-medium text-gray-700">Sort by:</span>
+            <SortAsc className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Sort by:</span>
             <Select value={sortBy} onValueChange={v => setSortBy(v as typeof sortBy)}>
-              <SelectTrigger className="w-40 bg-white/70 backdrop-blur-sm border-emerald-200" aria-label="Sort by">
+              <SelectTrigger className="w-40 bg-white/70 backdrop-blur-sm border-emerald-200 dark:bg-gray-800/70 dark:border-emerald-700/50 dark:text-gray-200" aria-label="Sort by">
                 <SelectValue
                   aria-label={
                     sortBy === 'name' ? 'Name' : sortBy === 'lastWatered' ? 'Last Watered' : 'Next Water Due'
