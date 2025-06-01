@@ -42,15 +42,6 @@ export default function PlantGrid({ plants, userId, loadingPlantId, onWateringSu
 
               {/* Header with plant icon and name */}
               <div className="relative p-6 pb-4">
-                {isOverdue && (
-                  <div className="absolute top-3 right-3">
-                    <div className="flex items-center gap-1 px-2 py-1 bg-gradient-to-r from-amber-400 to-orange-500 text-white text-xs font-medium rounded-full shadow-md">
-                      <AlertTriangle className="w-3 h-3" />
-                      Due
-                    </div>
-                  </div>
-                )}
-                
                 <div className="flex items-start gap-4">
                   <div className="relative">
                     <div className="w-12 h-12 bg-gradient-to-br from-green-400 to-emerald-600 rounded-full flex items-center justify-center shadow-lg">
