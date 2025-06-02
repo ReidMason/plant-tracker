@@ -16,8 +16,8 @@ type EventsService interface {
 	CreateWateringEvent(ctx context.Context, plantId int64, note string) (database.Event, error)
 	CreateFertilizeEvent(ctx context.Context, plantId int64, note string) (database.Event, error)
 	GetEventById(ctx context.Context, id int64) (database.Event, error)
-	GetLatestWaterEventByPlantId(ctx context.Context, plantid int64) (database.Event, error)
-	GetLatestFertilizerEventByPlantId(ctx context.Context, plantid int64) (database.Event, error)
+	GetLatestEventsByTypeForPlant(ctx context.Context, plantid int64) ([]database.Event, error)
+	GetLatestWaterAndFertilizerEvents(ctx context.Context, plantid int64) (waterEvent, fertilizerEvent database.Event, err error)
 }
 
 type eventsService struct {
@@ -30,14 +30,6 @@ func New(eventsStore eventsStore.EventsStore, plantsStore plantsStore.PlantsStor
 		eventsStore: eventsStore,
 		plantsStore: plantsStore,
 	}
-}
-
-func (s *eventsService) GetLatestWaterEventByPlantId(ctx context.Context, plantId int64) (database.Event, error) {
-	return s.eventsStore.GetLatestWaterEventByPlantId(ctx, plantId)
-}
-
-func (s *eventsService) GetLatestFertilizerEventByPlantId(ctx context.Context, plantId int64) (database.Event, error) {
-	return s.eventsStore.GetLatestFertilizerEventByPlantId(ctx, plantId)
 }
 
 func (s *eventsService) GetEventsByPlantId(ctx context.Context, plantId int64) ([]database.Event, error) {
@@ -73,6 +65,30 @@ func (s *eventsService) CreateFertilizeEvent(ctx context.Context, plantId int64,
 
 func (s *eventsService) GetEventById(ctx context.Context, id int64) (database.Event, error) {
 	return s.eventsStore.GetEventById(ctx, id)
+}
+
+func (s *eventsService) GetLatestEventsByTypeForPlant(ctx context.Context, plantId int64) ([]database.Event, error) {
+	return s.eventsStore.GetLatestEventsByTypeForPlant(ctx, plantId)
+}
+
+// GetLatestWaterAndFertilizerEvents efficiently gets both water and fertilizer events in a single query
+func (s *eventsService) GetLatestWaterAndFertilizerEvents(ctx context.Context, plantId int64) (waterEvent, fertilizerEvent database.Event, err error) {
+	events, err := s.eventsStore.GetLatestEventsByTypeForPlant(ctx, plantId)
+	if err != nil {
+		return database.Event{}, database.Event{}, err
+	}
+
+	// Separate the events by type
+	for _, event := range events {
+		switch event.Eventtype {
+		case 1: // Water event
+			waterEvent = event
+		case 2: // Fertilizer event
+			fertilizerEvent = event
+		}
+	}
+
+	return waterEvent, fertilizerEvent, nil
 }
 
 type plantsError string

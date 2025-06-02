@@ -88,44 +88,35 @@ func (q *Queries) GetEventsByPlantId(ctx context.Context, plantid int64) ([]Even
 	return items, nil
 }
 
-const getLatestFertilizerEventByPlantId = `-- name: GetLatestFertilizerEventByPlantId :one
-SELECT id, plantid, eventtype, note, timestamp
-FROM events
-WHERE plantid = $1 AND eventtype = 2
-ORDER BY timestamp DESC
-LIMIT 1
+const getLatestEventsByTypeForPlant = `-- name: GetLatestEventsByTypeForPlant :many
+SELECT DISTINCT ON (eventtype) id, plantid, eventtype, note, timestamp
+FROM events 
+WHERE plantid = $1 AND eventtype IN (1, 2)
+ORDER BY eventtype, timestamp DESC
 `
 
-func (q *Queries) GetLatestFertilizerEventByPlantId(ctx context.Context, plantid int64) (Event, error) {
-	row := q.db.QueryRow(ctx, getLatestFertilizerEventByPlantId, plantid)
-	var i Event
-	err := row.Scan(
-		&i.ID,
-		&i.Plantid,
-		&i.Eventtype,
-		&i.Note,
-		&i.Timestamp,
-	)
-	return i, err
-}
-
-const getLatestWaterEventByPlantId = `-- name: GetLatestWaterEventByPlantId :one
-SELECT id, plantid, eventtype, note, timestamp
-FROM events
-WHERE plantid = $1 AND eventtype = 1
-ORDER BY timestamp DESC
-LIMIT 1
-`
-
-func (q *Queries) GetLatestWaterEventByPlantId(ctx context.Context, plantid int64) (Event, error) {
-	row := q.db.QueryRow(ctx, getLatestWaterEventByPlantId, plantid)
-	var i Event
-	err := row.Scan(
-		&i.ID,
-		&i.Plantid,
-		&i.Eventtype,
-		&i.Note,
-		&i.Timestamp,
-	)
-	return i, err
+func (q *Queries) GetLatestEventsByTypeForPlant(ctx context.Context, plantid int64) ([]Event, error) {
+	rows, err := q.db.Query(ctx, getLatestEventsByTypeForPlant, plantid)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Event
+	for rows.Next() {
+		var i Event
+		if err := rows.Scan(
+			&i.ID,
+			&i.Plantid,
+			&i.Eventtype,
+			&i.Note,
+			&i.Timestamp,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }

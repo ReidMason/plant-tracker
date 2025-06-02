@@ -9,16 +9,8 @@ INSERT INTO events (plantId, eventType, note, timestamp)
 VALUES ($1, $2, $3, $4)
 RETURNING *;
 
--- name: GetLatestWaterEventByPlantId :one
-SELECT id, plantid, eventtype, note, timestamp
-FROM events
-WHERE plantid = $1 AND eventtype = 1
-ORDER BY timestamp DESC
-LIMIT 1;
-
--- name: GetLatestFertilizerEventByPlantId :one
-SELECT id, plantid, eventtype, note, timestamp
-FROM events
-WHERE plantid = $1 AND eventtype = 2
-ORDER BY timestamp DESC
-LIMIT 1; 
+-- name: GetLatestEventsByTypeForPlant :many
+SELECT DISTINCT ON (eventtype) id, plantid, eventtype, note, timestamp
+FROM events 
+WHERE plantid = $1 AND eventtype IN (1, 2)
+ORDER BY eventtype, timestamp DESC; 

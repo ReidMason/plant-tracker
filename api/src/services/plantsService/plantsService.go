@@ -61,16 +61,21 @@ func (p *PlantsService) GetPlantsByUserId(ctx context.Context, userId int64) ([]
 	}
 
 	for i, plant := range plantsResult {
-		// Get latest water event
-		latestWaterEvent, err := p.eventsStore.GetLatestWaterEventByPlantId(ctx, plant.Id)
-		if err == nil && latestWaterEvent != (database.Event{}) {
+		// Get latest water and fertilizer events in a single query
+		latestWaterEvent, latestFertilizerEvent, err := p.eventsStore.GetLatestWaterAndFertilizerEvents(ctx, plant.Id)
+		if err != nil {
+			// If there's an error, continue with the plant without events
+			continue
+		}
+
+		// Set water event data if available
+		if latestWaterEvent != (database.Event{}) {
 			plantsResult[i].LatestWaterEvent = latestWaterEvent
 			plantsResult[i].NextWaterDue = calculateNextWaterTime(latestWaterEvent.Timestamp)
 		}
 
-		// Get latest fertilizer event
-		latestFertilizerEvent, err := p.eventsStore.GetLatestFertilizerEventByPlantId(ctx, plant.Id)
-		if err == nil && latestFertilizerEvent != (database.Event{}) {
+		// Set fertilizer event data if available
+		if latestFertilizerEvent != (database.Event{}) {
 			plantsResult[i].LatestFertilizerEvent = latestFertilizerEvent
 			plantsResult[i].NextFertilizerDue = calculateNextFertilizerTime(latestFertilizerEvent.Timestamp)
 		}
@@ -97,18 +102,20 @@ func (p *PlantsService) GetPlantById(ctx context.Context, id int64) (Plant, erro
 	}
 	model := DatabasePlantToPlantModel(plant)
 
-	// Get latest water event
-	latestWaterEvent, err := p.eventsStore.GetLatestWaterEventByPlantId(ctx, model.Id)
-	if err == nil && latestWaterEvent != (database.Event{}) {
-		model.LatestWaterEvent = latestWaterEvent
-		model.NextWaterDue = calculateNextWaterTime(latestWaterEvent.Timestamp)
-	}
+	// Get latest water and fertilizer events in a single query
+	latestWaterEvent, latestFertilizerEvent, err := p.eventsStore.GetLatestWaterAndFertilizerEvents(ctx, model.Id)
+	if err == nil {
+		// Set water event data if available
+		if latestWaterEvent != (database.Event{}) {
+			model.LatestWaterEvent = latestWaterEvent
+			model.NextWaterDue = calculateNextWaterTime(latestWaterEvent.Timestamp)
+		}
 
-	// Get latest fertilizer event
-	latestFertilizerEvent, err := p.eventsStore.GetLatestFertilizerEventByPlantId(ctx, model.Id)
-	if err == nil && latestFertilizerEvent != (database.Event{}) {
-		model.LatestFertilizerEvent = latestFertilizerEvent
-		model.NextFertilizerDue = calculateNextFertilizerTime(latestFertilizerEvent.Timestamp)
+		// Set fertilizer event data if available
+		if latestFertilizerEvent != (database.Event{}) {
+			model.LatestFertilizerEvent = latestFertilizerEvent
+			model.NextFertilizerDue = calculateNextFertilizerTime(latestFertilizerEvent.Timestamp)
+		}
 	}
 
 	return model, nil
