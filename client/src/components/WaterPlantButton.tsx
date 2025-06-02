@@ -23,7 +23,7 @@ export default function WaterPlantButton({ userId, plantId, onSuccess, disabled,
   const handleWaterPlant = async () => {
     setIsSubmitting(true);
     try {
-      const result = await createWateringEvent(userId, plantId, { note: "" });
+      const result = await createWateringEvent(userId, plantId, { eventType: 1, note: "" });
 
       if (!result.ok) {
         console.error("Failed to water plant:", result.error.message);
