@@ -1,5 +1,6 @@
 export enum EventType {
-  Water = 1
+  Water = 1,
+  Fertilize = 2
 }
 
 export interface Event {
@@ -11,5 +12,6 @@ export interface Event {
 }
 
 export interface CreateEventRequest {
+  eventType: EventType;
   note: string;
 }

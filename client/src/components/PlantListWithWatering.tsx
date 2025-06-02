@@ -162,7 +162,7 @@ export default function PlantListWithWatering({ plants: initialPlants, userId }:
           plants={sortedPlants}
           userId={userId}
           loadingPlantId={loadingPlantId}
-          onWateringSuccess={handleWateringSuccess}
+          onPlantActionSuccess={handleWateringSuccess}
         />
       )}
     </div>

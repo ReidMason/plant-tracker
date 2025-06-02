@@ -94,9 +94,15 @@ func (h *eventsHandler) handleCreateEvent(w http.ResponseWriter, r *http.Request
 	// Set the plant ID from the URL parameter
 	createEventDto.PlantId = plantId
 
-	// Create watering event
+	// Validate event type
+	if createEventDto.EventType != 1 && createEventDto.EventType != 2 {
+		apiResponse.BadRequest[any](w, []string{"Invalid event type"})
+		return
+	}
+
+	// Create event
 	ctx := r.Context()
-	newEvent, err := h.eventsService.CreateWateringEvent(ctx, int64(createEventDto.PlantId), createEventDto.Note)
+	newEvent, err := h.eventsService.CreateEvent(ctx, int64(createEventDto.PlantId), createEventDto.EventType, createEventDto.Note)
 	if err != nil {
 		apiResponse.InternalServerError[any](w, []string{"Failed to create event"})
 		return

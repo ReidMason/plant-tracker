@@ -3,8 +3,11 @@
 import { notFound } from "next/navigation";
 import { getPlantById, Plant } from "@/lib/services/plantsService/plantsService";
 import LastWateredDisplay from "@/components/LastWateredDisplay";
+import LastFertilizedDisplay from "@/components/LastFertilizedDisplay";
 import WaterPlantButton from "@/components/WaterPlantButton";
+import FertilizePlantButton from "@/components/FertilizePlantButton";
 import WaterDropletAnimation from "@/components/WaterDropletAnimation";
+import FertilizerSparkleAnimation from "@/components/FertilizerSparkleAnimation";
 import Link from "next/link";
 import RenamePlant from "@/components/RenamePlant";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -23,6 +26,7 @@ export default function PlantPage({ params, searchParams }: PlantPageProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [animationType, setAnimationType] = useState<'water' | 'fertilizer'>('water');
 
   useEffect(() => {
     async function loadData() {
@@ -56,8 +60,28 @@ export default function PlantPage({ params, searchParams }: PlantPageProps) {
     loadData();
   }, [params, searchParams]);
 
+  const refreshPlantData = async () => {
+    if (!userId || !plant) return;
+    
+    try {
+      const resolvedParams = await params;
+      const result = await getPlantById(userId, resolvedParams.id);
+      if (result.ok) {
+        setPlant(result.value);
+      }
+    } catch (error) {
+      console.error("Failed to refresh plant data:", error);
+    }
+  };
+
   const handleWateringClick = () => {
     setIsAnimating(true);
+    setAnimationType('water');
+  };
+
+  const handleFertilizerClick = () => {
+    setIsAnimating(true);
+    setAnimationType('fertilizer');
   };
 
   const handleAnimationComplete = () => {
@@ -105,6 +129,7 @@ export default function PlantPage({ params, searchParams }: PlantPageProps) {
   }
 
   const needsWatering = !plant.nextWaterDue || (plant.nextWaterDue instanceof Date && plant.nextWaterDue.getTime() < Date.now());
+  const needsFertilizer = !plant.nextFertilizerDue || (plant.nextFertilizerDue instanceof Date && plant.nextFertilizerDue.getTime() < Date.now());
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-green-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
@@ -131,15 +156,21 @@ export default function PlantPage({ params, searchParams }: PlantPageProps) {
               Plant Details
             </h1>
             <p className="text-lg text-gray-600 dark:text-gray-400">
-              Manage your plant&apos;s care and watering schedule
+              Manage your plant&apos;s care, watering, and fertilizing schedule
             </p>
           </div>
 
           {/* Main Plant Card */}
           <Card className="bg-white/95 backdrop-blur-sm border border-gray-200/50 shadow-2xl dark:bg-gray-800/95 dark:border-gray-700/50 relative">
-            {/* Water droplet animation overlay */}
-            {isAnimating && (
+            {/* Animation overlays */}
+            {isAnimating && animationType === 'water' && (
               <WaterDropletAnimation
+                isAnimating={isAnimating}
+                onAnimationComplete={handleAnimationComplete}
+              />
+            )}
+            {isAnimating && animationType === 'fertilizer' && (
+              <FertilizerSparkleAnimation
                 isAnimating={isAnimating}
                 onAnimationComplete={handleAnimationComplete}
               />
@@ -208,18 +239,62 @@ export default function PlantPage({ params, searchParams }: PlantPageProps) {
                 </div>
               </div>
 
-              {/* Water Button */}
-              <div className="pt-2">
+              {/* Fertilizer Status */}
+              <div className={`p-6 rounded-xl border ${needsFertilizer
+                ? 'bg-gradient-to-r from-yellow-50 to-amber-50 border-yellow-200 dark:from-yellow-900/20 dark:to-amber-900/20 dark:border-yellow-700/30'
+                : 'bg-gradient-to-r from-emerald-50 to-green-50 border-emerald-200 dark:from-emerald-900/20 dark:to-green-900/20 dark:border-emerald-700/30'
+                }`}>
+                <div className="flex items-start gap-3">
+                  {needsFertilizer ? (
+                    <div className="w-12 h-12 bg-gradient-to-br from-yellow-500 to-orange-600 rounded-full flex items-center justify-center flex-shrink-0">
+                      <Sparkles className="w-6 h-6 text-white" />
+                    </div>
+                  ) : (
+                    <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-green-600 rounded-full flex items-center justify-center flex-shrink-0">
+                      <Calendar className="w-6 h-6 text-white" />
+                    </div>
+                  )}
+
+                  <div className="flex-1">
+                    <h3 className={`font-semibold mb-2 ${needsFertilizer
+                      ? 'text-yellow-800 dark:text-yellow-300'
+                      : 'text-emerald-800 dark:text-emerald-300'
+                      }`}>
+                      {needsFertilizer ? 'Fertilizer Needed' : 'Fertilizer Status'}
+                    </h3>
+                    <div className="text-gray-700 dark:text-gray-300">
+                      <LastFertilizedDisplay
+                        lastFertilizerEvent={plant.lastFertilizerEvent}
+                        nextFertilizerDue={plant.nextFertilizerDue}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="pt-2 grid grid-cols-2 gap-4">
                 <WaterPlantButton
                   userId={Number(userId)}
                   plantId={plant.id}
                   onClick={handleWateringClick}
+                  onSuccess={refreshPlantData}
                   size="lg"
-                  className={`w-full py-4 text-base font-semibold shadow-lg hover:shadow-xl transition-all duration-300 ${needsWatering
+                  className={`py-4 text-base font-semibold shadow-lg hover:shadow-xl transition-all duration-300 ${needsWatering
                     ? 'bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700'
                     : 'bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700'
                     }`}
                   needsWatering={needsWatering}
+                />
+                
+                <FertilizePlantButton
+                  userId={Number(userId)}
+                  plantId={plant.id}
+                  onClick={handleFertilizerClick}
+                  onSuccess={refreshPlantData}
+                  size="lg"
+                  needsFertilizer={needsFertilizer}
+                  className="py-4 text-base font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
                 />
               </div>
             </CardContent>

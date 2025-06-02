@@ -9,10 +9,12 @@ import (
 )
 
 type PlantResponseDto struct {
-	LastWaterEvent *eventDtos.EventResponseDto `json:"lastWaterEvent"`
-	NextWaterDue   *time.Time                  `json:"nextWaterDue"`
-	Name           string                      `json:"name"`
-	Id             int64                       `json:"id"`
+	LastWaterEvent      *eventDtos.EventResponseDto `json:"lastWaterEvent"`
+	LastFertilizerEvent *eventDtos.EventResponseDto `json:"lastFertilizerEvent"`
+	NextWaterDue        *time.Time                  `json:"nextWaterDue"`
+	NextFertilizerDue   *time.Time                  `json:"nextFertilizerDue"`
+	Name                string                      `json:"name"`
+	Id                  int64                       `json:"id"`
 }
 
 func FromStorePlants(plants []database.Plant) []*PlantResponseDto {
@@ -43,8 +45,16 @@ func FromServicePlant(plant plantsService.Plant) *PlantResponseDto {
 		response.LastWaterEvent = eventDtos.FromStoreEvent(plant.LatestWaterEvent)
 	}
 
+	if plant.LatestFertilizerEvent != (database.Event{}) {
+		response.LastFertilizerEvent = eventDtos.FromStoreEvent(plant.LatestFertilizerEvent)
+	}
+
 	if plant.NextWaterDue != (time.Time{}) {
 		response.NextWaterDue = &plant.NextWaterDue
+	}
+
+	if plant.NextFertilizerDue != (time.Time{}) {
+		response.NextFertilizerDue = &plant.NextFertilizerDue
 	}
 
 	return response

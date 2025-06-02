@@ -14,4 +14,11 @@ SELECT id, plantid, eventtype, note, timestamp
 FROM events
 WHERE plantid = $1 AND eventtype = 1
 ORDER BY timestamp DESC
+LIMIT 1;
+
+-- name: GetLatestFertilizerEventByPlantId :one
+SELECT id, plantid, eventtype, note, timestamp
+FROM events
+WHERE plantid = $1 AND eventtype = 2
+ORDER BY timestamp DESC
 LIMIT 1; 

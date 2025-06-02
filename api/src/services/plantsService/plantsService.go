@@ -24,17 +24,20 @@ type PlantsService struct {
 }
 
 type Plant struct {
-	LatestWaterEvent database.Event
-	NextWaterDue     time.Time
-	Name             string
-	Id               int64
+	LatestWaterEvent      database.Event
+	LatestFertilizerEvent database.Event
+	NextWaterDue          time.Time
+	NextFertilizerDue     time.Time
+	Name                  string
+	Id                    int64
 }
 
 func DatabasePlantToPlantModel(plant database.Plant) Plant {
 	return Plant{
-		Id:               plant.ID,
-		Name:             plant.Name,
-		LatestWaterEvent: database.Event{},
+		Id:                    plant.ID,
+		Name:                  plant.Name,
+		LatestWaterEvent:      database.Event{},
+		LatestFertilizerEvent: database.Event{},
 	}
 }
 
@@ -58,12 +61,19 @@ func (p *PlantsService) GetPlantsByUserId(ctx context.Context, userId int64) ([]
 	}
 
 	for i, plant := range plantsResult {
+		// Get latest water event
 		latestWaterEvent, err := p.eventsStore.GetLatestWaterEventByPlantId(ctx, plant.Id)
-		if err != nil || latestWaterEvent == (database.Event{}) {
-			continue
+		if err == nil && latestWaterEvent != (database.Event{}) {
+			plantsResult[i].LatestWaterEvent = latestWaterEvent
+			plantsResult[i].NextWaterDue = calculateNextWaterTime(latestWaterEvent.Timestamp)
 		}
-		plantsResult[i].LatestWaterEvent = latestWaterEvent
-		plantsResult[i].NextWaterDue = calculateNextWaterTime(latestWaterEvent.Timestamp)
+
+		// Get latest fertilizer event
+		latestFertilizerEvent, err := p.eventsStore.GetLatestFertilizerEventByPlantId(ctx, plant.Id)
+		if err == nil && latestFertilizerEvent != (database.Event{}) {
+			plantsResult[i].LatestFertilizerEvent = latestFertilizerEvent
+			plantsResult[i].NextFertilizerDue = calculateNextFertilizerTime(latestFertilizerEvent.Timestamp)
+		}
 	}
 
 	return plantsResult, nil
@@ -71,6 +81,10 @@ func (p *PlantsService) GetPlantsByUserId(ctx context.Context, userId int64) ([]
 
 func calculateNextWaterTime(lastWaterTime time.Time) time.Time {
 	return lastWaterTime.AddDate(0, 0, 7)
+}
+
+func calculateNextFertilizerTime(lastFertilizerTime time.Time) time.Time {
+	return lastFertilizerTime.AddDate(0, 0, 30) // 30 days for fertilizer
 }
 
 func (p *PlantsService) GetPlantById(ctx context.Context, id int64) (Plant, error) {
@@ -82,11 +96,21 @@ func (p *PlantsService) GetPlantById(ctx context.Context, id int64) (Plant, erro
 		return Plant{}, err
 	}
 	model := DatabasePlantToPlantModel(plant)
+
+	// Get latest water event
 	latestWaterEvent, err := p.eventsStore.GetLatestWaterEventByPlantId(ctx, model.Id)
 	if err == nil && latestWaterEvent != (database.Event{}) {
 		model.LatestWaterEvent = latestWaterEvent
 		model.NextWaterDue = calculateNextWaterTime(latestWaterEvent.Timestamp)
 	}
+
+	// Get latest fertilizer event
+	latestFertilizerEvent, err := p.eventsStore.GetLatestFertilizerEventByPlantId(ctx, model.Id)
+	if err == nil && latestFertilizerEvent != (database.Event{}) {
+		model.LatestFertilizerEvent = latestFertilizerEvent
+		model.NextFertilizerDue = calculateNextFertilizerTime(latestFertilizerEvent.Timestamp)
+	}
+
 	return model, nil
 }
 

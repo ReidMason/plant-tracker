@@ -14,9 +14,10 @@ interface WaterPlantButtonProps {
   onClick?: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
   size?: "sm" | "lg";
   className?: string;
+  compact?: boolean;
 }
 
-export default function WaterPlantButton({ userId, plantId, onSuccess, disabled, needsWatering, onClick, size = "sm", className }: WaterPlantButtonProps) {
+export default function WaterPlantButton({ userId, plantId, onSuccess, disabled, needsWatering, onClick, size = "sm", className, compact = false }: WaterPlantButtonProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleWaterPlant = async () => {
@@ -49,6 +50,7 @@ export default function WaterPlantButton({ userId, plantId, onSuccess, disabled,
         cursor-pointer w-full h-full
         transition-all duration-300
         shadow-lg hover:shadow-xl
+        flex items-center justify-center
         ${className || ""}
       `}
       onClick={e => {
@@ -59,13 +61,13 @@ export default function WaterPlantButton({ userId, plantId, onSuccess, disabled,
     >
       {isSubmitting ? (
         <>
-          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          Watering...
+          <Loader2 className="mr-2 h-4 w-4 animate-spin flex-shrink-0" />
+          <span className="text-center">{compact ? "Watering..." : "Watering..."}</span>
         </>
       ) : (
         <>
-          <Droplet className="mr-2 h-4 w-4" />
-          Water Plant
+          <Droplet className="mr-2 h-4 w-4 flex-shrink-0" />
+          <span className="text-center">{compact ? "Water" : "Water Plant"}</span>
         </>
       )}
     </Button>

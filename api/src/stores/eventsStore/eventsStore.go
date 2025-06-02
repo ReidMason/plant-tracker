@@ -11,4 +11,5 @@ type EventsStore interface {
 	GetEventById(ctx context.Context, id int64) (database.Event, error)
 	GetEventsByPlantId(ctx context.Context, plantid int64) ([]database.Event, error)
 	GetLatestWaterEventByPlantId(ctx context.Context, plantid int64) (database.Event, error)
+	GetLatestFertilizerEventByPlantId(ctx context.Context, plantid int64) (database.Event, error)
 }
